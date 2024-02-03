@@ -1,0 +1,25 @@
+version: '3.1'
+
+services:
+  backend:
+    container_name: nestjs-test
+    hostname: nestjs-test-hostname
+    restart: always
+    ports:
+      - 4000:4000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    build: .
+    links:
+      - mongo
+  mongo:
+    image: mongo:latest
+    container_name: mymongodb
+    hostname: mymongodb-hostname
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo:/data/db
+      - ./mongo/log:/var/log/mongodb/
