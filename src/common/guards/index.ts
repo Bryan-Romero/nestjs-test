@@ -1,3 +1,3 @@
-export * from './roles-guard.guard';
+export * from './roles.guard';
 export * from './api-key.guard';
-export * from './auth-guard.guard';
+export * from './auth.guard';

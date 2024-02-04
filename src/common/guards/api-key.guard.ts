@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ErrorMessage } from '../enums';
+import { HttpMessage } from '../enums';
 
 const x_api_key = 'x-api-key';
 
@@ -18,7 +18,7 @@ export class ApiKeyGuard implements CanActivate {
       : request.headers[x_api_key];
 
     if (!this.validApyKeyFromHeader(apiKey)) {
-      throw new UnauthorizedException(ErrorMessage.INVALID_API_KEY);
+      throw new UnauthorizedException(HttpMessage.INVALID_API_KEY);
     }
     return true;
   }

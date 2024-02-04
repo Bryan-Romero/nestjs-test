@@ -9,6 +9,7 @@ export default () => ({
   },
   default_user: {
     name: process.env.DEFAULT_USER_NAME,
+    role: process.env.DEFAULT_USER_ROLE,
     email: process.env.DEFAULT_USER_EMAIL,
     password: process.env.DEFAULT_USER_PASSWORD,
   },

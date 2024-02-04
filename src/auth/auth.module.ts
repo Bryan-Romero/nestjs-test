@@ -5,6 +5,7 @@ import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnvironmentVariables, JwtType } from 'src/common/interfaces';
+import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
 
 @Module({
   imports: [
@@ -26,9 +27,10 @@ import { EnvironmentVariables, JwtType } from 'src/common/interfaces';
       },
       inject: [ConfigService],
     }),
+    BcryptjsModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService],
 })
 export class AuthModule {}

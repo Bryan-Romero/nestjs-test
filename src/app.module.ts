@@ -17,6 +17,8 @@ import { AuthModule } from './auth/auth.module';
 import configuración from './config/configuración';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseType, EnvironmentVariables } from './common/interfaces';
+import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,6 +37,7 @@ import { DatabaseType, EnvironmentVariables } from './common/interfaces';
     }),
     UserModule,
     AuthModule,
+    BcryptjsModule,
   ],
   controllers: [AppController],
   providers: [

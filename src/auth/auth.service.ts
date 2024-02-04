@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
-import * as bcryptjs from 'bcryptjs';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,7 +11,8 @@ import {
   EnvironmentVariables,
   JwtPayload,
 } from 'src/common/interfaces';
-import { ErrorMessage } from 'src/common/enums';
+import { HttpMessage } from 'src/common/enums';
+import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -20,25 +20,32 @@ export class AuthService implements OnModuleInit {
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
     private readonly configService: ConfigService<EnvironmentVariables>,
+    private readonly bcryptjsService: BcryptjsService,
   ) {}
   async signIn(signInDto: SignInDto) {
     const { email, password } = signInDto;
 
     // Validate if email exists
-    const user = await this.userModel.findOne({ email });
-    if (!user) throw new BadRequestException(ErrorMessage.INVALID_CREDENTIALS);
+    const user = await this.userModel.findOne(
+      { email },
+      {
+        age: true,
+        email: true,
+        name: true,
+        password: true,
+      },
+    );
+    if (!user) throw new BadRequestException(HttpMessage.INVALID_CREDENTIALS);
 
     // Validate password
-    const isPasswordValid = await this.compareStringHash(
+    const isPasswordValid = await this.bcryptjsService.compareStringHash(
       password,
       user.password,
     );
     if (!isPasswordValid)
-      throw new BadRequestException(ErrorMessage.INVALID_CREDENTIALS);
+      throw new BadRequestException(HttpMessage.INVALID_CREDENTIALS);
 
-    return {
-      access_token: await this.getToken({ id: user._id }),
-    };
+    return await this.signInRes(user);
   }
 
   async signUp(signUpDto: SignUpDto) {
@@ -46,22 +53,19 @@ export class AuthService implements OnModuleInit {
 
     // Validate if email already exists
     const existUser = await this.userModel.findOne({ email });
-    if (existUser) throw new BadRequestException(ErrorMessage.EMAIL_EXISTS);
+    if (existUser)
+      throw new BadRequestException(HttpMessage.USER_ALREADY_EXIST);
 
-    const hash = await this.hashString(password);
+    const hash = await this.bcryptjsService.hashString(password);
     const user = await this.userModel.create({ name, email, password: hash });
 
+    return await this.signInRes(user);
+  }
+
+  async signInRes(user: any) {
     return {
       access_token: await this.getToken({ id: user._id }),
     };
-  }
-
-  async hashString(data: string) {
-    return await bcryptjs.hashSync(data, 10);
-  }
-
-  async compareStringHash(data: string, hash: string) {
-    return await bcryptjs.compareSync(data, hash);
   }
 
   async getToken(payload: JwtPayload): Promise<string> {
@@ -75,7 +79,7 @@ export class AuthService implements OnModuleInit {
   }
 
   private async createDefaultUser(): Promise<void> {
-    const { email, password, name } =
+    const { email, password, name, role } =
       this.configService.get<DefaultUserType>('default_user');
 
     const existingUser = await this.userModel.findOne({
@@ -84,11 +88,12 @@ export class AuthService implements OnModuleInit {
 
     // If default user does not exist then create default user
     if (!existingUser) {
-      const hash = await this.hashString(password);
+      const hash = await this.bcryptjsService.hashString(password);
       await this.userModel.create({
         name,
         email,
         password: hash,
+        roles: [role],
       });
     }
   }

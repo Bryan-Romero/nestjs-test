@@ -17,6 +17,7 @@ export type DatabaseType = {
 
 export type DefaultUserType = {
   name: string;
+  role: string;
   email: string;
   password: string;
 };
