@@ -1,19 +1,14 @@
 version: '3.8'
 
 services:
-  api-development:
-    container_name: api-development
-    restart: unless-stopped
+  api-production:
+    container_name: api-production
     build:
       dockerfile: Dockerfile
       context: .
-      target: development
+      target: production
     ports:
-      - 4000:4000
-      - 9229:9229 # for debugging
-    volumes:
-      - .:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
+      - 5000:5000
     depends_on:
       - mongo
 
