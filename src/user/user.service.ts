@@ -4,9 +4,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, PipelineStage } from 'mongoose';
 import { User } from './entities/user.entity';
-import { HttpMessage } from 'src/common/enums';
+import { HttpMessage, Role } from 'src/common/enums';
 import { PaginationDto } from 'src/common/pagination-dto/pagination.dto';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
+import { FindAllResDto } from './dto-res/find-all-res.dto';
+import { MessageResDto } from 'src/common/message-res-dto/message-res.dto';
+import { plainToClass } from 'class-transformer';
+import { FindOneResDto } from './dto-res/find-one-res.dto';
 
 @Injectable()
 export class UserService {
@@ -15,7 +19,7 @@ export class UserService {
     private readonly bcryptjsService: BcryptjsService,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<CreateUserDto> {
     const { email } = createUserDto;
     const existUser = await this.userModel.findOne({
       email,
@@ -33,16 +37,21 @@ export class UserService {
       ...createUserDto,
     });
 
-    const user = await this.userModel.findOne({ _id: newUser._id });
+    const user = await this.userModel.findOne(
+      { _id: newUser._id },
+      {
+        active: 0,
+      },
+    );
 
-    return user;
+    return plainToClass(CreateUserDto, user);
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationDto: PaginationDto): Promise<FindAllResDto> {
     const { limit = 10, page = 1 } = paginationDto;
 
     const pipeline: PipelineStage[] = [
-      { $match: { active: true } },
+      { $match: { active: true, roles: { $in: [Role.USER] } } },
       {
         $facet: {
           data: [
@@ -72,25 +81,29 @@ export class UserService {
     ];
 
     const result = await this.userModel.aggregate(pipeline);
+    const users = result[0].data;
 
     return {
-      data: result[0].data,
+      data: users,
       total_items: result[0].total || 0,
       total_pages: Math.ceil(result[0].total / Number(limit)) || 0,
     };
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string): Promise<FindOneResDto> {
     const user = await this.userModel.findOne({ _id: id, active: true });
 
     if (!user) {
       throw new BadRequestException(`User ${id} does not exist`);
     }
 
-    return user;
+    return plainToClass(FindOneResDto, user);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UpdateUserDto> {
     const updateUser = await this.userModel.findOneAndUpdate(
       {
         _id: id,
@@ -106,10 +119,10 @@ export class UserService {
       throw new BadRequestException(`User ${id} does not exist`);
     }
 
-    return updateUser;
+    return plainToClass(UpdateUserDto, updateUser);
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<MessageResDto> {
     const updateUser = await this.userModel.findOneAndUpdate(
       {
         _id: id,

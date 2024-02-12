@@ -14,7 +14,8 @@ import { UserModule } from './user/user.module';
 import { LoggerMiddleware } from './common/middlewares';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import configuración from './config/configuración';
+import { configuration } from './config/configuration';
+import { validationSchema } from './config/validation';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseType, EnvironmentVariables } from './common/interfaces';
 import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
@@ -22,9 +23,12 @@ import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.development.local', '.env.development'],
+      envFilePath: [
+        `${process.cwd()}/src/config/env/.env.${process.env.NODE_ENV}`,
+      ],
       isGlobal: true,
-      load: [configuración],
+      load: [configuration],
+      validationSchema,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

@@ -1,15 +1,19 @@
-import { PickType } from '@nestjs/mapped-types';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 import { User } from 'src/user/entities/user.entity';
 
 export class SignUpDto extends PickType(User, ['name', 'email', 'password']) {
+  @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty({ type: String })
   @IsEmail()
   email: string;
 
+  @ApiProperty({ type: String })
   @IsString()
   @Matches(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
@@ -18,5 +22,6 @@ export class SignUpDto extends PickType(User, ['name', 'email', 'password']) {
         'password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character and be at least 8 characters long',
     },
   )
+  @Transform(({ value }) => value.trim())
   password: string;
 }

@@ -1,8 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { PickType } from '@nestjs/swagger';
+import { Document, Types } from 'mongoose';
 import { Role } from 'src/common/enums';
 
 @Schema({ timestamps: true })
-export class User {
+export class User extends PickType(Document, ['_id'] as const) {
   @Prop({ type: Boolean, default: true, select: false })
   active: boolean;
 
@@ -19,13 +21,21 @@ export class User {
     sparse: true,
     trim: true,
     lowercase: true,
+    required: true,
   })
   email: string;
 
-  @Prop({ type: String, select: false })
+  @Prop({ type: String, required: true, select: false })
   password: string;
 
   @Prop({ type: [String], enum: Role, default: [Role.USER] })
-  roles: string[];
+  roles: Role[];
+
+  // Document prop
+  _id: Types.ObjectId;
+
+  // Timestamps props
+  createdAt: Date;
+  updatedAt: Date;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

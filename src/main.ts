@@ -3,12 +3,24 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { logger } from './common/middlewares';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { EnvironmentVariables } from './common/interfaces';
+import helmet from 'helmet';
+import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService<EnvironmentVariables>);
+  const prefix = configService.get<string>('prefix');
+  const port = configService.get<number>('port');
+  const NODE_ENV = configService.get<string>('NODE_ENV');
+  console.log('Environment: ', NODE_ENV);
 
-  // Routes
-  app.setGlobalPrefix('api/v1');
+  // Global prefix
+  app.setGlobalPrefix(prefix);
+
+  // Cors
+  app.enableCors();
 
   // Pipes
   app.useGlobalPipes(
@@ -24,8 +36,22 @@ async function bootstrap() {
 
   // Middlewares
   app.use(logger);
+  app.use(helmet());
+  app.use(compression());
 
-  const configService = app.get(ConfigService);
-  await app.listen(configService.get('config.port'));
+  // Swagger Module
+  const config = new DocumentBuilder()
+    .setTitle('Nest-Test')
+    .setDescription('The Nest-Test API description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'x-api-key')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
+
+  // Listen
+  console.log('Server listening on port: ', port);
+  await app.listen(port);
 }
 bootstrap();

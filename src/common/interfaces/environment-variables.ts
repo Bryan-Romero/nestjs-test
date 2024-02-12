@@ -1,13 +1,12 @@
 export interface EnvironmentVariables {
-  config: ConfigType;
+  NODE_ENV: string;
+  port: number;
+  prefix: string;
+  api_key: string;
   database: DatabaseType;
   default_user: DefaultUserType;
   jwt: JwtType;
 }
-
-export type ConfigType = {
-  port: number;
-};
 
 export type DatabaseType = {
   user: string;

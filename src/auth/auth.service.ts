@@ -13,6 +13,7 @@ import {
 } from 'src/common/interfaces';
 import { HttpMessage } from 'src/common/enums';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
+import { SignInResDto } from './dto-res/sign-in-res.dto';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -22,7 +23,7 @@ export class AuthService implements OnModuleInit {
     private readonly configService: ConfigService<EnvironmentVariables>,
     private readonly bcryptjsService: BcryptjsService,
   ) {}
-  async signIn(signInDto: SignInDto) {
+  async signIn(signInDto: SignInDto): Promise<SignInResDto> {
     const { email, password } = signInDto;
 
     // Validate if email exists
@@ -48,7 +49,7 @@ export class AuthService implements OnModuleInit {
     return await this.signInRes(user);
   }
 
-  async signUp(signUpDto: SignUpDto) {
+  async signUp(signUpDto: SignUpDto): Promise<SignInResDto> {
     const { email, name, password } = signUpDto;
 
     // Validate if email already exists
@@ -62,9 +63,9 @@ export class AuthService implements OnModuleInit {
     return await this.signInRes(user);
   }
 
-  async signInRes(user: any) {
+  async signInRes(user: User): Promise<SignInResDto> {
     return {
-      access_token: await this.getToken({ id: user._id }),
+      access_token: await this.getToken({ sub: user._id }),
     };
   }
 

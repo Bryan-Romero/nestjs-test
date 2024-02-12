@@ -1,4 +1,5 @@
-dist
-mongo
-node_modules
-.env*
+*
+
+!package*.json
+!tsconfig*.json
+!/src

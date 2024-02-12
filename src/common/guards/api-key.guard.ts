@@ -5,17 +5,22 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { HttpMessage } from '../enums';
+import { ConfigService } from '@nestjs/config';
+import { EnvironmentVariables } from '../interfaces';
 
-const x_api_key = 'x-api-key';
+export const X_API_KEY = 'x-api-key';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
+  constructor(
+    private readonly configService: ConfigService<EnvironmentVariables>,
+  ) {}
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
 
-    const apiKey = Array.isArray(request.headers[x_api_key])
-      ? request.headers[x_api_key][0]
-      : request.headers[x_api_key];
+    const apiKey = Array.isArray(request.headers[X_API_KEY])
+      ? request.headers[X_API_KEY][0]
+      : request.headers[X_API_KEY];
 
     if (!this.validApyKeyFromHeader(apiKey)) {
       throw new UnauthorizedException(HttpMessage.INVALID_API_KEY);
@@ -24,6 +29,7 @@ export class ApiKeyGuard implements CanActivate {
   }
 
   private validApyKeyFromHeader(apiKey: string | undefined): boolean {
-    return apiKey === '12345';
+    const api_key = this.configService.get<string>('api_key');
+    return apiKey === api_key;
   }
 }

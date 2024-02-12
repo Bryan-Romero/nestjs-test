@@ -1,6 +1,11 @@
-export default () => ({
-  config: {
-    port: parseInt(process.env.PORT, 10) || 3000,
+export const configuration = () => ({
+  NODE_ENV: process.env.NODE_ENV,
+  port: process.env.PORT,
+  prefix: process.env.PREFIX,
+  api_key: process.env.API_KEY,
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expiresIn: process.env.JWT_EXPIRES_IN,
   },
   database: {
     user: process.env.DATABASE_USER,
@@ -13,8 +18,6 @@ export default () => ({
     email: process.env.DEFAULT_USER_EMAIL,
     password: process.env.DEFAULT_USER_PASSWORD,
   },
-  jwt: {
-    secret: process.env.JWT_SECRET,
-    expire: process.env.JWT_EXPIRE,
-  },
 });
+
+// https://dev.to/pitops/managing-multiple-environments-in-nestjs-71l

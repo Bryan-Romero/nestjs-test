@@ -1,25 +1,43 @@
-version: '3.1'
+version: '3.8'
 
 services:
-  backend:
-    container_name: nestjs-test
-    hostname: nestjs-test-hostname
-    restart: always
+  api-production:
+    container_name: api-production
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: production
+    ports:
+      - 5000:5000
+    depends_on:
+      - mongo
+
+  api-development:
+    container_name: api-development
+    restart: unless-stopped
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: development
+    command: npm run start:dev
     ports:
       - 4000:4000
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules
-    build: .
-    links:
+      - node_modules:/usr/src/app/node_modules
+    depends_on:
       - mongo
+
   mongo:
     image: mongo:latest
     container_name: mymongodb
-    hostname: mymongodb-hostname
     restart: always
     ports:
       - 27017:27017
     volumes:
       - ./mongo:/data/db
       - ./mongo/log:/var/log/mongodb/
+
+volumes:
+  node_modules:
+# https://www.tomray.dev/nestjs-docker-compose-postgres#add-dockerfile
