@@ -3,7 +3,7 @@ import { User } from '../entities/user.entity';
 import { ApiProperty, PickType, PartialType } from '@nestjs/swagger';
 
 export class UpdateUserDto extends PickType(PartialType(User), [
-  'name',
+  'username',
   'age',
 ]) {
   @ApiProperty({ type: Number, required: false })
@@ -14,5 +14,5 @@ export class UpdateUserDto extends PickType(PartialType(User), [
   @ApiProperty({ type: String, required: false })
   @IsString()
   @IsOptional()
-  name?: string;
+  username?: string;
 }

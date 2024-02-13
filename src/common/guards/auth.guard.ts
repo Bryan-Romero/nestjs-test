@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { EnvironmentVariables, JwtPayload, JwtType } from '../interfaces';
+import { ConfigurationType, JwtPayload, JwtType } from '../interfaces';
 import { HttpMessage } from '../enums';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators';
@@ -16,7 +16,7 @@ import { CustomRequest } from '../interfaces/custom-request';
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    private readonly configService: ConfigService<EnvironmentVariables>,
+    private readonly configService: ConfigService<ConfigurationType>,
     private reflector: Reflector,
   ) {}
 

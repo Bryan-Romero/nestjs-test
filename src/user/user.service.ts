@@ -30,7 +30,7 @@ export class UserService {
 
     const randomPassword = await this.bcryptjsService.generateRandomPassword();
     console.log(randomPassword);
-    const hash = await this.bcryptjsService.hashString(randomPassword);
+    const hash = await this.bcryptjsService.hashData(randomPassword);
     const newUser = await this.userModel.create({
       email,
       password: hash,

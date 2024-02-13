@@ -9,7 +9,7 @@ export class User extends PickType(Document, ['_id'] as const) {
   active: boolean;
 
   @Prop({ type: String })
-  name: string;
+  username: string;
 
   @Prop({ type: String })
   age: number;

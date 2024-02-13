@@ -5,7 +5,7 @@ export const configuration = () => ({
   api_key: process.env.API_KEY,
   jwt: {
     secret: process.env.JWT_SECRET,
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    expires_in: process.env.JWT_EXPIRES_IN,
   },
   database: {
     user: process.env.DATABASE_USER,
@@ -13,7 +13,7 @@ export const configuration = () => ({
     uri: process.env.DATABASE_URI,
   },
   default_user: {
-    name: process.env.DEFAULT_USER_NAME,
+    username: process.env.DEFAULT_USER_NAME,
     role: process.env.DEFAULT_USER_ROLE,
     email: process.env.DEFAULT_USER_EMAIL,
     password: process.env.DEFAULT_USER_PASSWORD,

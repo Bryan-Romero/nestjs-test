@@ -4,13 +4,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { logger } from './common/middlewares';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { EnvironmentVariables } from './common/interfaces';
+import { ConfigurationType } from './common/interfaces';
 import helmet from 'helmet';
 import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService<EnvironmentVariables>);
+  const configService = app.get(ConfigService<ConfigurationType>);
   const prefix = configService.get<string>('prefix');
   const port = configService.get<number>('port');
   const NODE_ENV = configService.get<string>('NODE_ENV');

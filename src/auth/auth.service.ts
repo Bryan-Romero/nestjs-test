@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import {
   DefaultUserType,
-  EnvironmentVariables,
+  ConfigurationType,
   JwtPayload,
 } from 'src/common/interfaces';
 import { HttpMessage } from 'src/common/enums';
@@ -20,7 +20,7 @@ export class AuthService implements OnModuleInit {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
-    private readonly configService: ConfigService<EnvironmentVariables>,
+    private readonly configService: ConfigService<ConfigurationType>,
     private readonly bcryptjsService: BcryptjsService,
   ) {}
   async signIn(signInDto: SignInDto): Promise<SignInResDto> {
@@ -32,7 +32,7 @@ export class AuthService implements OnModuleInit {
       {
         age: true,
         email: true,
-        name: true,
+        username: true,
         password: true,
       },
     );
@@ -50,15 +50,19 @@ export class AuthService implements OnModuleInit {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<SignInResDto> {
-    const { email, name, password } = signUpDto;
+    const { email, username, password } = signUpDto;
 
     // Validate if email already exists
     const existUser = await this.userModel.findOne({ email });
     if (existUser)
       throw new BadRequestException(HttpMessage.USER_ALREADY_EXIST);
 
-    const hash = await this.bcryptjsService.hashString(password);
-    const user = await this.userModel.create({ name, email, password: hash });
+    const hash = await this.bcryptjsService.hashData(password);
+    const user = await this.userModel.create({
+      username,
+      email,
+      password: hash,
+    });
 
     return await this.signInRes(user);
   }
@@ -80,7 +84,7 @@ export class AuthService implements OnModuleInit {
   }
 
   private async createDefaultUser(): Promise<void> {
-    const { email, password, name, role } =
+    const { email, password, username, role } =
       this.configService.get<DefaultUserType>('default_user');
 
     const existingUser = await this.userModel.findOne({
@@ -89,9 +93,9 @@ export class AuthService implements OnModuleInit {
 
     // If default user does not exist then create default user
     if (!existingUser) {
-      const hash = await this.bcryptjsService.hashString(password);
+      const hash = await this.bcryptjsService.hashData(password);
       await this.userModel.create({
-        name,
+        username,
         email,
         password: hash,
         roles: [role],

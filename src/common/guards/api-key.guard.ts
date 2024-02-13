@@ -6,14 +6,14 @@ import {
 } from '@nestjs/common';
 import { HttpMessage } from '../enums';
 import { ConfigService } from '@nestjs/config';
-import { EnvironmentVariables } from '../interfaces';
+import { ConfigurationType } from '../interfaces';
 
 export const X_API_KEY = 'x-api-key';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
   constructor(
-    private readonly configService: ConfigService<EnvironmentVariables>,
+    private readonly configService: ConfigService<ConfigurationType>,
   ) {}
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();

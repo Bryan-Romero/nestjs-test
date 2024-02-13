@@ -3,11 +3,15 @@ import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 import { User } from 'src/user/entities/user.entity';
 
-export class SignUpDto extends PickType(User, ['name', 'email', 'password']) {
+export class SignUpDto extends PickType(User, [
+  'username',
+  'email',
+  'password',
+]) {
   @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  username: string;
 
   @ApiProperty({ type: String })
   @IsEmail()

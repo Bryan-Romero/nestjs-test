@@ -3,12 +3,12 @@ import { User } from '../entities/user.entity';
 import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
-export class FindOneResDto extends PickType(User, ['email', 'name']) {
+export class FindOneResDto extends PickType(User, ['email', 'username']) {
   @ApiProperty({ type: String })
   @Expose()
   email: string;
 
   @ApiProperty({ type: String })
   @Expose()
-  name: string;
+  username: string;
 }

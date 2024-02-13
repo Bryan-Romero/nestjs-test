@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EnvironmentVariables, JwtType } from 'src/common/interfaces';
+import { ConfigurationType, JwtType } from 'src/common/interfaces';
 import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
 
 @Module({
@@ -13,14 +13,12 @@ import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       global: true,
-      useFactory: async (
-        configService: ConfigService<EnvironmentVariables>,
-      ) => {
-        const { expire, secret } = configService.get<JwtType>('jwt');
+      useFactory: async (configService: ConfigService<ConfigurationType>) => {
+        const { expires_in, secret } = configService.get<JwtType>('jwt');
         return {
-          secret: secret,
+          secret,
           signOptions: {
-            expiresIn: expire,
+            expiresIn: expires_in,
           },
           global: true,
         };

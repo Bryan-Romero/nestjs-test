@@ -17,7 +17,7 @@ import { AuthModule } from './auth/auth.module';
 import { configuration } from './config/configuration';
 import { validationSchema } from './config/validation';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DatabaseType, EnvironmentVariables } from './common/interfaces';
+import { DatabaseType, ConfigurationType } from './common/interfaces';
 import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
 
 @Module({
@@ -32,9 +32,7 @@ import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (
-        configService: ConfigService<EnvironmentVariables>,
-      ) => ({
+      useFactory: async (configService: ConfigService<ConfigurationType>) => ({
         uri: configService.get<DatabaseType>('database').uri,
       }),
       inject: [ConfigService],

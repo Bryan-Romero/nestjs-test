@@ -1,4 +1,4 @@
-export interface EnvironmentVariables {
+export interface ConfigurationType {
   NODE_ENV: string;
   port: number;
   prefix: string;
@@ -15,7 +15,7 @@ export type DatabaseType = {
 };
 
 export type DefaultUserType = {
-  name: string;
+  username: string;
   role: string;
   email: string;
   password: string;
@@ -23,5 +23,5 @@ export type DefaultUserType = {
 
 export type JwtType = {
   secret: string;
-  expire: string;
+  expires_in: string;
 };
