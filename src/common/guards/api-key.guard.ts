@@ -23,7 +23,10 @@ export class ApiKeyGuard implements CanActivate {
       : request.headers[X_API_KEY];
 
     if (!this.validApyKeyFromHeader(apiKey)) {
-      throw new UnauthorizedException(HttpMessage.INVALID_API_KEY);
+      throw new UnauthorizedException(
+        HttpMessage.ACCESS_DENIED,
+        'Invalid API Key',
+      );
     }
     return true;
   }

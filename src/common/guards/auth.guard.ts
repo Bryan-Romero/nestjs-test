@@ -37,7 +37,10 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<CustomRequest>();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException(HttpMessage.INVALID_TOKEN);
+      throw new UnauthorizedException(
+        HttpMessage.UNAUTHORIZED,
+        'Token not found',
+      );
     }
     try {
       // 💡 We're passing the token to `verify` along with a possible secret key
@@ -48,7 +51,10 @@ export class AuthGuard implements CanActivate {
 
       const user = await this.userModel.findOne({ _id: sub });
       if (!user) {
-        throw new UnauthorizedException(HttpMessage.INVALID_TOKEN);
+        throw new UnauthorizedException(
+          HttpMessage.UNAUTHORIZED,
+          'User not found',
+        );
       }
 
       const { _id, email, roles, username } = user;
@@ -59,7 +65,10 @@ export class AuthGuard implements CanActivate {
         username,
       };
     } catch {
-      throw new UnauthorizedException(HttpMessage.INVALID_TOKEN);
+      throw new UnauthorizedException(
+        HttpMessage.UNAUTHORIZED,
+        'Invalid token',
+      );
     }
     return true;
   }

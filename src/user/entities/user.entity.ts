@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { PickType } from '@nestjs/swagger';
-import { Document, Types } from 'mongoose';
+import { Document, SaveOptions, Types } from 'mongoose';
 import { Role } from 'src/common/enums';
 
 @Schema({ timestamps: true })
-export class User extends PickType(Document, ['_id'] as const) {
+export class User extends Document {
   @Prop({ type: Boolean, default: true, select: false })
   active: boolean;
 

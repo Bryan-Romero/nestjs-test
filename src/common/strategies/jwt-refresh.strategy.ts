@@ -42,7 +42,11 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
     const user = await this.userModel.findOne({ _id: sub });
 
-    if (!user) throw new UnauthorizedException(HttpMessage.ACCESS_DENIED);
+    if (!user)
+      throw new UnauthorizedException(
+        HttpMessage.UNAUTHORIZED,
+        'User not found',
+      );
 
     const refresh_token = request
       .get('authorization')

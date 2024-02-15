@@ -13,7 +13,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ParseMongoIdPipe } from 'src/common/pipes';
-import { Auth, GetUser } from 'src/common/decorators';
+import { Auth, GetUser, JwtAuth } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
 import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -52,7 +52,7 @@ export class UserController {
     description: 'Get user information authentication',
     type: User,
   })
-  @Auth()
+  @JwtAuth()
   @Get('me')
   me(@GetUser('_id') _id: string): Promise<User> {
     return this.userService.me(_id);
@@ -72,14 +72,14 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Update user by id',
-    type: UpdateUserDto,
+    type: User,
   })
   @Auth(Role.USER)
   @Patch(':id')
   update(
     @Param('id', ParseMongoIdPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<UpdateUserDto> {
+  ): Promise<User> {
     return this.userService.update(id, updateUserDto);
   }
 

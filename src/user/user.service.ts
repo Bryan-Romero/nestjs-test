@@ -1,14 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage } from 'mongoose';
+import { Model, PipelineStage, Types } from 'mongoose';
 import { User } from './entities/user.entity';
 import { HttpMessage, Role } from 'src/common/enums';
 import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { FindAllResDto } from './dto/find-all-res.dto';
-import { plainToClass } from 'class-transformer';
 import { generateRandomPassword } from 'src/common/utils/generate-random-pass';
 
 @Injectable()
@@ -25,7 +28,10 @@ export class UserService {
     });
 
     if (existUser)
-      throw new BadRequestException(HttpMessage.USER_ALREADY_EXIST);
+      throw new ConflictException(
+        HttpMessage.CONFLICT,
+        `User ${existUser.email} already exists`,
+      );
 
     const randomPassword = generateRandomPassword(12);
     console.log(randomPassword);
@@ -90,65 +96,48 @@ export class UserService {
   }
 
   async me(_id: string): Promise<User> {
+    const user = await this.findOneByIdVerifyExist(_id);
+
+    return user;
+  }
+
+  async findOne(_id: string): Promise<User> {
+    const user = await this.findOneByIdVerifyExist(_id);
+
+    return user;
+  }
+
+  async update(_id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findOneByIdVerifyExist(_id);
+
+    const { age, username } = updateUserDto;
+    user.age = age;
+    user.username = username;
+    await user.save();
+
+    return user;
+  }
+
+  async remove(_id: string): Promise<MessageResDto> {
+    const user = await this.findOneByIdVerifyExist(_id);
+
+    user.active = false;
+    await user.save();
+
+    return { message: HttpMessage.SUCCESS };
+  }
+
+  async findOneByIdVerifyExist(_id: string | Types.ObjectId): Promise<User> {
     const user = await this.userModel.findOne({ _id, active: true });
 
     if (!user) {
-      throw new BadRequestException(`User ${_id} does not exist`);
+      console.log(`User with _id ${_id} does not exist`);
+      throw new NotFoundException(
+        HttpMessage.NOT_FOUND,
+        `User with _id ${_id} does not exist`,
+      );
     }
 
     return user;
-  }
-
-  async findOne(id: string): Promise<User> {
-    const user = await this.userModel.findOne({ _id: id, active: true });
-
-    if (!user) {
-      throw new BadRequestException(`User ${id} does not exist`);
-    }
-
-    return user;
-  }
-
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UpdateUserDto> {
-    const updateUser = await this.userModel.findOneAndUpdate(
-      {
-        _id: id,
-        active: true,
-      },
-      updateUserDto,
-      {
-        new: true,
-      },
-    );
-
-    if (!updateUser) {
-      throw new BadRequestException(`User ${id} does not exist`);
-    }
-
-    return plainToClass(UpdateUserDto, updateUser);
-  }
-
-  async remove(id: string): Promise<MessageResDto> {
-    const updateUser = await this.userModel.findOneAndUpdate(
-      {
-        _id: id,
-        active: true,
-      },
-      {
-        active: false,
-      },
-      {
-        new: true,
-      },
-    );
-
-    if (!updateUser) {
-      throw new BadRequestException(`User ${id} does not exist`);
-    }
-
-    return { message: HttpMessage.SUCCESS };
   }
 }

@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  OnModuleInit,
+} from '@nestjs/common';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -61,7 +66,11 @@ export class AuthService implements OnModuleInit {
 
     // Validate if email already exists
     const existUser = await this.userModel.findOne({ email });
-    if (existUser) throw new ForbiddenException(HttpMessage.ACCESS_DENIED);
+    if (existUser)
+      throw new ConflictException(
+        HttpMessage.CONFLICT,
+        `User ${existUser.email} already exists`,
+      );
 
     const hash = await this.bcryptjsService.hashData(password);
     const user = await this.userModel.create({
