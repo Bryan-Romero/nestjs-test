@@ -11,6 +11,9 @@ import { HttpMessage } from '../enums';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators';
 import { CustomRequest } from '../interfaces/custom-request';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from 'src/user/entities/user.entity';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -18,6 +21,7 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private readonly configService: ConfigService<ConfigurationType>,
     private reflector: Reflector,
+    @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -38,12 +42,22 @@ export class AuthGuard implements CanActivate {
     try {
       // 💡 We're passing the token to `verify` along with a possible secret key
       const { secret } = this.configService.get<JwtType>('jwt');
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+      const { sub } = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret,
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request.user = payload;
+
+      const user = await this.userModel.findOne({ _id: sub });
+      if (!user) {
+        throw new UnauthorizedException(HttpMessage.INVALID_TOKEN);
+      }
+
+      const { _id, email, roles, username } = user;
+      request.user = {
+        email,
+        _id,
+        roles,
+        username,
+      };
     } catch {
       throw new UnauthorizedException(HttpMessage.INVALID_TOKEN);
     }

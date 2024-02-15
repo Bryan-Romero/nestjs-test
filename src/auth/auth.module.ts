@@ -6,10 +6,17 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConfigurationType, JwtType } from 'src/common/interfaces';
 import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
+import { PassportModule } from '@nestjs/passport';
+import {
+  JwtRefreshStrategy,
+  JwtStrategy,
+  LocalStrategy,
+} from 'src/common/strategies';
 
 @Module({
   imports: [
     UserModule,
+    PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       global: true,
@@ -20,7 +27,6 @@ import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
           signOptions: {
             expiresIn: expires_in,
           },
-          global: true,
         };
       },
       inject: [ConfigService],
@@ -28,7 +34,7 @@ import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
     BcryptjsModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

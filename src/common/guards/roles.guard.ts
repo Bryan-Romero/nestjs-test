@@ -8,16 +8,10 @@ import { Reflector } from '@nestjs/core';
 import { HttpMessage, Role, RoleLevel } from '../enums';
 import { ROLES_KEY } from '../decorators';
 import { CustomRequest } from '../interfaces';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/entities/user.entity';
-import { Model } from 'mongoose';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    @InjectModel(User.name) private userModel: Model<User>,
-  ) {}
+  constructor(private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
@@ -30,12 +24,10 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest<CustomRequest>();
-    const user = await this.userModel.findById(request.user.sub);
-    if (!user) {
-      return false;
-    }
 
-    const hasPrivilege = this.checkUserAuthorization(user.roles, requiredRoles);
+    const { roles } = request.user;
+
+    const hasPrivilege = this.checkUserAuthorization(roles, requiredRoles);
 
     if (!hasPrivilege) throw new ForbiddenException(HttpMessage.ACCESS_DENIED);
 

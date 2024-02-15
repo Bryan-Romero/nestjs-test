@@ -5,12 +5,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, PipelineStage } from 'mongoose';
 import { User } from './entities/user.entity';
 import { HttpMessage, Role } from 'src/common/enums';
-import { PaginationDto } from 'src/common/pagination-dto/pagination.dto';
+import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
-import { FindAllResDto } from './dto-res/find-all-res.dto';
-import { MessageResDto } from 'src/common/message-res-dto/message-res.dto';
+import { FindAllResDto } from './dto/find-all-res.dto';
 import { plainToClass } from 'class-transformer';
-import { FindOneResDto } from './dto-res/find-one-res.dto';
+import { generateRandomPassword } from 'src/common/utils/generate-random-pass';
 
 @Injectable()
 export class UserService {
@@ -28,7 +27,7 @@ export class UserService {
     if (existUser)
       throw new BadRequestException(HttpMessage.USER_ALREADY_EXIST);
 
-    const randomPassword = await this.bcryptjsService.generateRandomPassword();
+    const randomPassword = generateRandomPassword(12);
     console.log(randomPassword);
     const hash = await this.bcryptjsService.hashData(randomPassword);
     const newUser = await this.userModel.create({
@@ -44,7 +43,7 @@ export class UserService {
       },
     );
 
-    return plainToClass(CreateUserDto, user);
+    return user;
   }
 
   async findAll(paginationDto: PaginationDto): Promise<FindAllResDto> {
@@ -90,14 +89,24 @@ export class UserService {
     };
   }
 
-  async findOne(id: string): Promise<FindOneResDto> {
+  async me(_id: string): Promise<User> {
+    const user = await this.userModel.findOne({ _id, active: true });
+
+    if (!user) {
+      throw new BadRequestException(`User ${_id} does not exist`);
+    }
+
+    return user;
+  }
+
+  async findOne(id: string): Promise<User> {
     const user = await this.userModel.findOne({ _id: id, active: true });
 
     if (!user) {
       throw new BadRequestException(`User ${id} does not exist`);
     }
 
-    return plainToClass(FindOneResDto, user);
+    return user;
   }
 
   async update(

@@ -1,9 +1,13 @@
 import { Request } from 'express';
-import { JwtPayload } from './jtw-payload';
+import { User } from 'src/user/entities/user.entity';
 
-// Define un nuevo tipo que extiende el tipo Request de Express
 export interface CustomRequest extends Request {
-  user?: JwtPayload;
+  user?: UserRequest;
+}
+
+export interface UserRequest
+  extends Pick<User, '_id' | 'email' | 'roles' | 'username'> {
+  refresh_token?: string;
 }
 
 // Archivo donde defines la extensión del objeto Request

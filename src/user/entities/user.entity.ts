@@ -31,6 +31,9 @@ export class User extends PickType(Document, ['_id'] as const) {
   @Prop({ type: [String], enum: Role, default: [Role.USER] })
   roles: Role[];
 
+  @Prop({ type: String, select: false })
+  hashRefreshToken: string;
+
   // Document prop
   _id: Types.ObjectId;
 

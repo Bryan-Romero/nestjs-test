@@ -8,7 +8,7 @@ import { isMongoId } from 'class-validator';
 
 @Injectable()
 export class ParseMongoIdPipe implements PipeTransform {
-  transform(value: string, metadata: ArgumentMetadata) {
+  transform(value: unknown, metadata: ArgumentMetadata) {
     if (!isMongoId(value)) {
       throw new BadRequestException(`${value} is not a mongoId`);
     }

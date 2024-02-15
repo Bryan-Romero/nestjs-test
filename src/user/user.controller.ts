@@ -15,12 +15,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ParseMongoIdPipe } from 'src/common/pipes';
 import { Auth, GetUser } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
-import { PaginationDto } from 'src/common/pagination-dto/pagination.dto';
+import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FindAllResDto } from './dto/find-all-res.dto';
 import { User } from './entities/user.entity';
-import { FindAllResDto } from './dto-res/find-all-res.dto';
-import { MessageResDto } from 'src/common/message-res-dto/message-res.dto';
-import { FindOneResDto } from './dto-res/find-one-res.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -51,12 +49,23 @@ export class UserController {
 
   @ApiResponse({
     status: HttpStatus.OK,
+    description: 'Get user information authentication',
+    type: User,
+  })
+  @Auth()
+  @Get('me')
+  me(@GetUser('_id') _id: string): Promise<User> {
+    return this.userService.me(_id);
+  }
+
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Get user by id',
-    type: FindOneResDto,
+    type: User,
   })
   @Auth()
   @Get(':id')
-  findOne(@Param('id', ParseMongoIdPipe) id: string): Promise<FindOneResDto> {
+  findOne(@Param('id', ParseMongoIdPipe) id: string): Promise<User> {
     return this.userService.findOne(id);
   }
 

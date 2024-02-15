@@ -1,11 +1,13 @@
 export const configuration = () => ({
-  NODE_ENV: process.env.NODE_ENV,
+  node_env: process.env.NODE_ENV,
   port: process.env.PORT,
   prefix: process.env.PREFIX,
   api_key: process.env.API_KEY,
   jwt: {
     secret: process.env.JWT_SECRET,
     expires_in: process.env.JWT_EXPIRES_IN,
+    secret_refresh: process.env.JWT_SECRET_REFRESH,
+    expires_in_refresh: process.env.JWT_EXPIRES_IN_REFRESH,
   },
   database: {
     user: process.env.DATABASE_USER,

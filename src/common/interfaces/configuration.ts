@@ -1,5 +1,5 @@
 export interface ConfigurationType {
-  NODE_ENV: string;
+  node_env: string;
   port: number;
   prefix: string;
   api_key: string;
@@ -8,20 +8,22 @@ export interface ConfigurationType {
   jwt: JwtType;
 }
 
-export type DatabaseType = {
+export interface DatabaseType {
   user: string;
   password: string;
   uri: string;
-};
+}
 
-export type DefaultUserType = {
+export interface DefaultUserType {
   username: string;
   role: string;
   email: string;
   password: string;
-};
+}
 
-export type JwtType = {
+export interface JwtType {
   secret: string;
   expires_in: string;
-};
+  secret_refresh: string;
+  expires_in_refresh: string;
+}
