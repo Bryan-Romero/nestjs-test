@@ -1,6 +1,8 @@
-export const configuration = () => ({
+import { ConfigurationType } from 'src/common/interfaces';
+
+export const configuration = (): ConfigurationType => ({
   node_env: process.env.NODE_ENV,
-  port: process.env.PORT,
+  port: parseInt(process.env.PORT, 10),
   prefix: process.env.PREFIX,
   api_key: process.env.API_KEY,
   jwt: {

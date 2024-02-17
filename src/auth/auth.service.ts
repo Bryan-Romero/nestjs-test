@@ -162,30 +162,6 @@ export class AuthService implements OnModuleInit {
     await this.userModel.updateOne({ _id }, { hashRefreshToken });
   }
 
-  async validateUser(email: string, password: string): Promise<UserRequest> {
-    const user = await this.userModel.findOne(
-      { email },
-      {
-        age: true,
-        email: true,
-        username: true,
-        password: true,
-      },
-    );
-    if (user) {
-      // Validate password
-      const isPasswordValid = await this.bcryptjsService.compareStringHash(
-        password,
-        user.password,
-      );
-
-      const { _id, roles, username } = user;
-      return isPasswordValid ? { _id, email, roles, username } : null;
-    }
-
-    return null;
-  }
-
   async onModuleInit() {
     await this.createDefaultUser();
   }

@@ -13,6 +13,7 @@ import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { FindAllResDto } from './dto/find-all-res.dto';
 import { generateRandomPassword } from 'src/common/utils/generate-random-pass';
+import { UserRequest } from 'src/common/interfaces';
 
 @Injectable()
 export class UserService {
@@ -139,5 +140,29 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async validateUser(email: string, password: string): Promise<UserRequest> {
+    const user = await this.userModel.findOne(
+      { email, active: true },
+      {
+        age: true,
+        email: true,
+        username: true,
+        password: true,
+      },
+    );
+    if (user) {
+      // Validate password
+      const isPasswordValid = await this.bcryptjsService.compareStringHash(
+        password,
+        user.password,
+      );
+
+      const { _id, roles, username } = user;
+      return isPasswordValid ? { _id, email, roles, username } : null;
+    }
+
+    return null;
   }
 }
