@@ -19,6 +19,7 @@ import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FindAllResDto } from './dto/find-all-res.dto';
 import { User } from './entities/user.entity';
+import { MeResDto } from './dto/me-res.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -50,11 +51,11 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get user information authentication',
-    type: User,
+    type: MeResDto,
   })
   @JwtAuth()
   @Get('me')
-  me(@GetUser('_id') _id: string): Promise<User> {
+  me(@GetUser('_id') _id: string): Promise<MeResDto> {
     return this.userService.me(_id);
   }
 

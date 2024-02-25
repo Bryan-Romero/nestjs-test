@@ -34,6 +34,12 @@ export class User extends Document {
   @Prop({ type: String, select: false })
   hashRefreshToken: string;
 
+  @Prop({ type: Boolean, default: false })
+  emailVerified: boolean;
+
+  @Prop({ type: String, select: false })
+  emailVerifiedToken: string;
+
   // Document prop
   _id: Types.ObjectId;
 

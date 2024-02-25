@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { SignInDto } from './dto/sign-in.dto';
@@ -22,21 +23,27 @@ import { HttpMessage } from 'src/common/enums';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { AccessResDto } from './dto/access-res.dto';
 import { MessageResDto } from 'src/common/dto';
+import { MailService } from 'src/common/mail/mail.service';
+import { v4 as uuidv4 } from 'uuid';
+import { EmailVerifiedDto } from './dto/email-verified.dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
     private readonly configService: ConfigService<ConfigurationType>,
     private readonly bcryptjsService: BcryptjsService,
+    private readonly mailService: MailService,
   ) {}
+
   async signIn(signInDto: SignInDto): Promise<AccessResDto> {
     const { email, password } = signInDto;
 
     // Validate if email exists
     const user = await this.userModel.findOne(
-      { email },
+      { email, active: true },
       {
         age: true,
         email: true,
@@ -73,11 +80,16 @@ export class AuthService implements OnModuleInit {
       );
 
     const hash = await this.bcryptjsService.hashData(password);
+    const emailVerifiedToken = uuidv4();
     const user = await this.userModel.create({
       username,
       email,
       password: hash,
+      emailVerifiedToken,
     });
+
+    // send confirmation mail
+    this.mailService.sendUserConfirmation(user, emailVerifiedToken);
 
     return await this.accessRes(user);
   }
@@ -117,13 +129,59 @@ export class AuthService implements OnModuleInit {
     };
   }
 
+  async emailVerified(
+    emailVerifiedDto: EmailVerifiedDto,
+  ): Promise<MessageResDto> {
+    const { token } = emailVerifiedDto;
+
+    const user = await this.userModel.findOne({
+      emailVerifiedToken: token,
+      active: true,
+    });
+    if (!user)
+      throw new NotFoundException(
+        HttpMessage.NOT_FOUND,
+        `User with emailVerifiedToken ${token} does not exist`,
+      );
+
+    user.emailVerifiedToken = null;
+    user.emailVerified = true;
+    await user.save();
+
+    return { message: HttpMessage.SUCCESS };
+  }
+
+  async resendVerificationEmail(email: string): Promise<MessageResDto> {
+    const user = await this.userModel.findOne(
+      { email, active: true },
+      { username: 1, email: 1, emailVerifiedToken: 1 },
+    );
+    if (!user)
+      throw new NotFoundException(
+        HttpMessage.NOT_FOUND,
+        `User with email ${email} does not exist`,
+      );
+
+    if (!user.emailVerifiedToken) {
+      const emailVerifiedToken = uuidv4();
+      user.emailVerifiedToken = emailVerifiedToken;
+      await user.save();
+    }
+
+    await this.mailService.sendUserConfirmation(user, user.emailVerifiedToken);
+
+    return {
+      message: HttpMessage.SUCCESS,
+    };
+  }
+
   async accessRes(user: {
     _id: Types.ObjectId;
     email: string;
   }): Promise<AccessResDto> {
     const { _id, email } = user;
     const { access_token, refresh_token } = await this.getTokens({
-      sub: _id,
+      sub: _id.toString(),
       email,
     });
 
@@ -182,6 +240,7 @@ export class AuthService implements OnModuleInit {
         email,
         password: hash,
         roles: [role],
+        emailVerified: true,
       });
     }
   }
