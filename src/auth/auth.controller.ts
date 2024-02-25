@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  HttpCode,
+  Patch,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -12,6 +19,7 @@ import {
 } from 'src/common/decorators';
 import { UserRequest } from 'src/common/interfaces';
 import { MessageResDto } from 'src/common/dto';
+import { EmailVerifiedDto } from './dto/email-verified.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -75,5 +83,30 @@ export class AuthController {
   @Post('logout')
   logout(@GetUser('_id') _id: string): Promise<MessageResDto> {
     return this.authService.logout(_id);
+  }
+
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Email verified',
+    type: MessageResDto,
+  })
+  @Patch('email-verified')
+  emailVerified(
+    @Body() emailVerifiedDto: EmailVerifiedDto,
+  ): Promise<MessageResDto> {
+    return this.authService.emailVerified(emailVerifiedDto);
+  }
+
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Resend verification email',
+    type: MessageResDto,
+  })
+  @JwtAuth()
+  @Post('resend-verification-email')
+  resendVerificationEmail(
+    @GetUser('email') email: string,
+  ): Promise<MessageResDto> {
+    return this.authService.resendVerificationEmail(email);
   }
 }

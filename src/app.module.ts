@@ -19,6 +19,8 @@ import { validationSchema } from './config/validation';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseType, ConfigurationType } from './common/interfaces';
 import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
+import { MailModule } from './common/mail/mail.module';
+import { UserPasswordModule } from './common/user-password/user-password.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
     UserModule,
     AuthModule,
     BcryptjsModule,
+    MailModule,
+    UserPasswordModule,
   ],
   controllers: [AppController],
   providers: [

@@ -4,4 +4,5 @@ export enum HttpMessage {
   UNAUTHORIZED = 'UNAUTHORIZED',
   NOT_FOUND = 'NOT_FOUND',
   CONFLICT = 'CONFLICT',
+  BAD_REQUEST = 'BAD_REQUEST',
 }

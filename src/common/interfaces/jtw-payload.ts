@@ -1,6 +1,9 @@
-import { Types } from 'mongoose';
-
 export interface JwtPayload {
-  sub: Types.ObjectId;
+  sub: string;
+  email: string;
+}
+
+export interface JwtForgotPassPayload {
+  sub: string;
   email: string;
 }

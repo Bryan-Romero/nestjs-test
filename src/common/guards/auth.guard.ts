@@ -11,17 +11,15 @@ import { HttpMessage } from '../enums';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators';
 import { CustomRequest } from '../interfaces/custom-request';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/entities/user.entity';
-import { Model } from 'mongoose';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
     private readonly configService: ConfigService<ConfigurationType>,
-    private reflector: Reflector,
-    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly reflector: Reflector,
+    private readonly userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -30,7 +28,6 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     if (isPublic) {
-      // 💡 See this condition
       return true;
     }
 
@@ -43,20 +40,12 @@ export class AuthGuard implements CanActivate {
       );
     }
     try {
-      // 💡 We're passing the token to `verify` along with a possible secret key
       const { secret } = this.configService.get<JwtType>('jwt');
       const { sub } = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret,
       });
-
-      const user = await this.userModel.findOne({ _id: sub });
-      if (!user) {
-        throw new UnauthorizedException(
-          HttpMessage.UNAUTHORIZED,
-          'User not found',
-        );
-      }
-
+      // Find user by id with exception if not found
+      const user = await this.userService.findUserById({ _id: sub });
       const { _id, email, roles, username } = user;
       request.user = {
         email,

@@ -6,6 +6,8 @@ export interface ConfigurationType {
   database: DatabaseType;
   default_user: DefaultUserType;
   jwt: JwtType;
+  mail: MailType;
+  bcryptjs_salt_rounds: number;
 }
 
 export interface DatabaseType {
@@ -26,4 +28,12 @@ export interface JwtType {
   expires_in: string;
   secret_refresh: string;
   expires_in_refresh: string;
+}
+
+export interface MailType {
+  host: string;
+  user: string;
+  password: string;
+  from: string;
+  port?: number;
 }

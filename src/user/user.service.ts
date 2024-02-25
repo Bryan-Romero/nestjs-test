@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -6,7 +7,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage, Types } from 'mongoose';
+import { Model, PipelineStage, ProjectionType } from 'mongoose';
 import { User } from './entities/user.entity';
 import { HttpMessage, Role } from 'src/common/enums';
 import { PaginationDto, MessageResDto } from 'src/common/dto';
@@ -14,6 +15,8 @@ import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { FindAllResDto } from './dto/find-all-res.dto';
 import { generateRandomPassword } from 'src/common/utils/generate-random-pass';
 import { UserRequest } from 'src/common/interfaces';
+import { MeResDto } from './dto/me-res.dto';
+import { isMongoId } from 'class-validator';
 
 @Injectable()
 export class UserService {
@@ -96,20 +99,20 @@ export class UserService {
     };
   }
 
-  async me(_id: string): Promise<User> {
-    const user = await this.findOneByIdVerifyExist(_id);
+  async me(_id: string): Promise<MeResDto> {
+    const user = await this.findUserById({ _id });
 
     return user;
   }
 
   async findOne(_id: string): Promise<User> {
-    const user = await this.findOneByIdVerifyExist(_id);
+    const user = await this.findUserById({ _id });
 
     return user;
   }
 
   async update(_id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOneByIdVerifyExist(_id);
+    const user = await this.findUserById({ _id });
 
     const { age, username } = updateUserDto;
     user.age = age;
@@ -120,26 +123,12 @@ export class UserService {
   }
 
   async remove(_id: string): Promise<MessageResDto> {
-    const user = await this.findOneByIdVerifyExist(_id);
+    const user = await this.findUserById({ _id });
 
     user.active = false;
     await user.save();
 
     return { message: HttpMessage.SUCCESS };
-  }
-
-  async findOneByIdVerifyExist(_id: string | Types.ObjectId): Promise<User> {
-    const user = await this.userModel.findOne({ _id, active: true });
-
-    if (!user) {
-      console.log(`User with _id ${_id} does not exist`);
-      throw new NotFoundException(
-        HttpMessage.NOT_FOUND,
-        `User with _id ${_id} does not exist`,
-      );
-    }
-
-    return user;
   }
 
   async validateUser(email: string, password: string): Promise<UserRequest> {
@@ -164,5 +153,45 @@ export class UserService {
     }
 
     return null;
+  }
+
+  async findUserByEmail(props: {
+    email: string;
+    projection?: ProjectionType<User>;
+    whitException?: boolean;
+  }): Promise<User> {
+    const { email, projection, whitException = true } = props;
+    const user = await this.userModel.findOne(
+      { email, active: true },
+      projection,
+    );
+
+    if (!user && whitException)
+      throw new NotFoundException(
+        HttpMessage.NOT_FOUND,
+        `User with email ${email} does not exist`,
+      );
+
+    return user || null;
+  }
+
+  async findUserById(props: {
+    _id: string;
+    projection?: ProjectionType<User>;
+    whitException?: boolean;
+  }): Promise<User> {
+    const { _id, projection, whitException = true } = props;
+    const user = await this.userModel.findOne(
+      { _id, active: true },
+      projection,
+    );
+
+    if (!user && whitException)
+      throw new NotFoundException(
+        HttpMessage.NOT_FOUND,
+        `User with _id ${_id} does not exist`,
+      );
+
+    return user || null;
   }
 }

@@ -22,6 +22,14 @@ export const configuration = (): ConfigurationType => ({
     email: process.env.DEFAULT_USER_EMAIL,
     password: process.env.DEFAULT_USER_PASSWORD,
   },
+  mail: {
+    host: process.env.MAIL_HOST,
+    user: process.env.MAIL_USER,
+    password: process.env.MAIL_PASSWORD,
+    from: process.env.MAIL_FROM,
+    port: parseInt(process.env.MAIL_PORT, 10),
+  },
+  bcryptjs_salt_rounds: parseInt(process.env.BCRYPTJS_SALT_ROUNDS, 10),
 });
 
 // https://dev.to/pitops/managing-multiple-environments-in-nestjs-71l

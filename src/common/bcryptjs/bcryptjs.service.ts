@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as bcryptjs from 'bcryptjs';
+import { ConfigurationType } from '../interfaces';
 
 @Injectable()
 export class BcryptjsService {
+  constructor(
+    private readonly configService: ConfigService<ConfigurationType>,
+  ) {}
+
   async hashData(data: string) {
-    return await bcryptjs.hashSync(data, 10);
+    const salt = this.configService.get<number>('bcryptjs_salt_rounds');
+    return await bcryptjs.hashSync(data, salt);
   }
 
   async compareStringHash(data: string, hash: string) {

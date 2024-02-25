@@ -13,6 +13,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/user/entities/user.entity';
 import { Model } from 'mongoose';
 import { HttpMessage } from 'src/common/enums';
+import { UserService } from 'src/user/user.service';
 
 // Nuestra estrategia Jwt Passport tiene un nombre predeterminado de 'jwt'
 @Injectable()
@@ -22,7 +23,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
 ) {
   constructor(
     private readonly configService: ConfigService<ConfigurationType>,
-    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly userService: UserService,
   ) {
     const { secret_refresh } = configService.get<JwtType>('jwt');
 
@@ -30,7 +31,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: secret_refresh,
-      passReqToCallback: true,
+      passReqToCallback: true, // allows us to pass back the request to the callback function in the validate method
     });
   }
 
@@ -39,14 +40,8 @@ export class JwtRefreshStrategy extends PassportStrategy(
     payload: JwtPayload,
   ): Promise<UserRequest> {
     const { sub } = payload;
-
-    const user = await this.userModel.findOne({ _id: sub });
-
-    if (!user)
-      throw new UnauthorizedException(
-        HttpMessage.UNAUTHORIZED,
-        'User not found',
-      );
+    // Find user by id with exception if not found
+    const user = await this.userService.findUserById({ _id: sub });
 
     const refresh_token = request
       .get('authorization')
