@@ -1,10 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { PickType } from '@nestjs/swagger';
-import { Document, SaveOptions, Types } from 'mongoose';
+import { HydratedDocument, Model, HydratedDocumentFromSchema } from 'mongoose';
 import { Role } from 'src/common/enums';
 
 @Schema({ timestamps: true })
-export class User extends Document {
+export class User {
   @Prop({ type: Boolean, default: true, select: false })
   active: boolean;
 
@@ -39,12 +38,8 @@ export class User extends Document {
 
   @Prop({ type: String, select: false })
   emailVerifiedToken: string;
-
-  // Document prop
-  _id: Types.ObjectId;
-
-  // Timestamps props
-  createdAt: Date;
-  updatedAt: Date;
 }
+
 export const UserSchema = SchemaFactory.createForClass(User);
+export type UserDocument = HydratedDocument<User>;
+export type UserModel = Model<UserDocument>;

@@ -8,17 +8,11 @@ import {
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/entities/user.entity';
-import { Model, Types } from 'mongoose';
+import { User, UserModel } from 'src/user/entities/user.entity';
+import { Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import {
-  ConfigurationType,
-  DefaultUserType,
-  JwtPayload,
-  JwtType,
-  UserRequest,
-} from 'src/common/interfaces';
+import { JwtPayload, UserRequest } from 'src/common/interfaces';
 import { HttpMessage } from 'src/common/enums';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { AccessResDto } from './dto/access-res.dto';
@@ -26,12 +20,16 @@ import { MessageResDto } from 'src/common/dto';
 import { MailService } from 'src/common/mail/mail.service';
 import { v4 as uuidv4 } from 'uuid';
 import { EmailVerifiedDto } from './dto/email-verified.dto';
-import { UserService } from 'src/user/user.service';
+import {
+  ConfigurationType,
+  DefaultUserType,
+  JwtType,
+} from 'src/config/configuration.interface';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(User.name) private userModel: UserModel,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<ConfigurationType>,
     private readonly bcryptjsService: BcryptjsService,

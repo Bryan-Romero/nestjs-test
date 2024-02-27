@@ -1,3 +1,5 @@
+import { Role } from 'src/common/enums';
+
 export interface ConfigurationType {
   node_env: string;
   port: number;
@@ -11,14 +13,12 @@ export interface ConfigurationType {
 }
 
 export interface DatabaseType {
-  user: string;
-  password: string;
   uri: string;
 }
 
 export interface DefaultUserType {
   username: string;
-  role: string;
+  role: Role;
   email: string;
   password: string;
 }

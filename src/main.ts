@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as compression from 'compression';
-import { ConfigurationType } from './common/interfaces';
+import { ConfigurationType } from './config/configuration.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

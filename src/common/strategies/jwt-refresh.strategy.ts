@@ -1,19 +1,10 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  ConfigurationType,
-  CustomRequest,
-  JwtPayload,
-  JwtType,
-  UserRequest,
-} from 'src/common/interfaces';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/entities/user.entity';
-import { Model } from 'mongoose';
-import { HttpMessage } from 'src/common/enums';
+import { CustomRequest, JwtPayload, UserRequest } from 'src/common/interfaces';
 import { UserService } from 'src/user/user.service';
+import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
 
 // Nuestra estrategia Jwt Passport tiene un nombre predeterminado de 'jwt'
 @Injectable()
@@ -22,7 +13,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
   'jwt-refresh',
 ) {
   constructor(
-    private readonly configService: ConfigService<ConfigurationType>,
+    configService: ConfigService<ConfigurationType>,
     private readonly userService: UserService,
   ) {
     const { secret_refresh } = configService.get<JwtType>('jwt');

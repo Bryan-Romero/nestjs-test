@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -7,8 +6,8 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage, ProjectionType } from 'mongoose';
-import { User } from './entities/user.entity';
+import { PipelineStage, ProjectionType } from 'mongoose';
+import { User, UserDocument, UserModel } from './entities/user.entity';
 import { HttpMessage, Role } from 'src/common/enums';
 import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
@@ -16,12 +15,11 @@ import { FindAllResDto } from './dto/find-all-res.dto';
 import { generateRandomPassword } from 'src/common/utils/generate-random-pass';
 import { UserRequest } from 'src/common/interfaces';
 import { MeResDto } from './dto/me-res.dto';
-import { isMongoId } from 'class-validator';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(User.name) private userModel: UserModel,
     private readonly bcryptjsService: BcryptjsService,
   ) {}
 
@@ -159,7 +157,7 @@ export class UserService {
     email: string;
     projection?: ProjectionType<User>;
     whitException?: boolean;
-  }): Promise<User> {
+  }): Promise<UserDocument> {
     const { email, projection, whitException = true } = props;
     const user = await this.userModel.findOne(
       { email, active: true },
@@ -179,7 +177,7 @@ export class UserService {
     _id: string;
     projection?: ProjectionType<User>;
     whitException?: boolean;
-  }): Promise<User> {
+  }): Promise<UserDocument> {
     const { _id, projection, whitException = true } = props;
     const user = await this.userModel.findOne(
       { _id, active: true },

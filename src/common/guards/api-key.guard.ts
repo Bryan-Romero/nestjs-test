@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { HttpMessage } from '../enums';
 import { ConfigService } from '@nestjs/config';
-import { ConfigurationType } from '../interfaces';
+import { ConfigurationType } from 'src/config/configuration.interface';
 
 export const X_API_KEY = 'x-api-key';
 

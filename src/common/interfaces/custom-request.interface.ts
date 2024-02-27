@@ -1,12 +1,12 @@
 import { Request } from 'express';
-import { User } from 'src/user/entities/user.entity';
+import { UserDocument } from 'src/user/entities/user.entity';
 
 export interface CustomRequest extends Request {
   user?: UserRequest;
 }
 
 export interface UserRequest
-  extends Pick<User, '_id' | 'email' | 'roles' | 'username'> {
+  extends Pick<UserDocument, '_id' | 'email' | 'roles' | 'username'> {
   refresh_token?: string;
 }
 

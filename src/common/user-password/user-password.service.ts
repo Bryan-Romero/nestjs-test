@@ -3,19 +3,12 @@ import {
   ForbiddenException,
   HttpException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { MessageResDto } from 'src/common/dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/entities/user.entity';
-import { Model } from 'mongoose';
+import { UserDocument } from 'src/user/entities/user.entity';
 import { HttpMessage } from 'src/common/enums';
-import {
-  ConfigurationType,
-  JwtForgotPassPayload,
-  JwtType,
-} from 'src/common/interfaces';
+import { JwtForgotPassPayload } from 'src/common/interfaces';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -23,11 +16,11 @@ import { MailService } from 'src/common/mail/mail.service';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { UserService } from 'src/user/user.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
 
 @Injectable()
 export class UserPasswordService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<ConfigurationType>,
@@ -120,7 +113,7 @@ export class UserPasswordService {
     };
   }
 
-  async getForgotPasswordToken(user: User): Promise<string> {
+  async getForgotPasswordToken(user: UserDocument): Promise<string> {
     const { email, _id, password } = user;
     const payload: JwtForgotPassPayload = {
       sub: _id.toString(),

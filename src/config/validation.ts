@@ -1,4 +1,5 @@
 import * as Joi from 'joi';
+import { Role } from 'src/common/enums';
 
 export const validationSchema = Joi.object({
   // api
@@ -16,7 +17,7 @@ export const validationSchema = Joi.object({
 
   // default user
   DEFAULT_USER_NAME: Joi.string().required(),
-  DEFAULT_USER_ROLE: Joi.string().required(),
+  DEFAULT_USER_ROLE: Joi.string().valid(...Object.values(Role)),
   DEFAULT_USER_EMAIL: Joi.string().required(),
   DEFAULT_USER_PASSWORD: Joi.string().required(),
 

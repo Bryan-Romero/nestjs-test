@@ -2,19 +2,15 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  ConfigurationType,
-  JwtPayload,
-  JwtType,
-  UserRequest,
-} from 'src/common/interfaces';
+import { JwtPayload, UserRequest } from 'src/common/interfaces';
 import { UserService } from 'src/user/user.service';
+import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
 
 // Nuestra estrategia Jwt Passport tiene un nombre predeterminado de 'jwt'
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    private readonly configService: ConfigService<ConfigurationType>,
+    configService: ConfigService<ConfigurationType>,
     private readonly userService: UserService,
   ) {
     const { secret } = configService.get<JwtType>('jwt');

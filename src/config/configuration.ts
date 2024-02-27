@@ -1,4 +1,5 @@
-import { ConfigurationType } from 'src/common/interfaces';
+import { Role } from 'src/common/enums';
+import { ConfigurationType } from './configuration.interface';
 
 export const configuration = (): ConfigurationType => ({
   node_env: process.env.NODE_ENV,
@@ -12,13 +13,11 @@ export const configuration = (): ConfigurationType => ({
     expires_in_refresh: process.env.JWT_EXPIRES_IN_REFRESH,
   },
   database: {
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
     uri: process.env.DATABASE_URI,
   },
   default_user: {
     username: process.env.DEFAULT_USER_NAME,
-    role: process.env.DEFAULT_USER_ROLE,
+    role: process.env.DEFAULT_USER_ROLE as Role,
     email: process.env.DEFAULT_USER_EMAIL,
     password: process.env.DEFAULT_USER_PASSWORD,
   },

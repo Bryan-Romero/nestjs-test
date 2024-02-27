@@ -17,10 +17,13 @@ import { AuthModule } from './auth/auth.module';
 import { configuration } from './config/configuration';
 import { validationSchema } from './config/validation';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DatabaseType, ConfigurationType } from './common/interfaces';
 import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
 import { MailModule } from './common/mail/mail.module';
 import { UserPasswordModule } from './common/user-password/user-password.module';
+import {
+  ConfigurationType,
+  DatabaseType,
+} from './config/configuration.interface';
 
 @Module({
   imports: [
