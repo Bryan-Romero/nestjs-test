@@ -1,4 +1,4 @@
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Global, Module } from '@nestjs/common';
@@ -13,6 +13,8 @@ import {
 @Module({
   imports: [
     MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: async (config: ConfigService<ConfigurationType>) => {
         const mail = config.get<MailType>('mail');
         return {
@@ -37,7 +39,6 @@ import {
           },
         };
       },
-      inject: [ConfigService],
     }),
   ],
   providers: [MailService],

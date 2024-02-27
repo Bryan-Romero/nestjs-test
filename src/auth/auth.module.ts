@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
 import { PassportModule } from '@nestjs/passport';
 import {
@@ -15,6 +15,8 @@ import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
 @Module({
   imports: [
     JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
       global: true,
       useFactory: async (configService: ConfigService<ConfigurationType>) => {
         const { expires_in, secret } = configService.get<JwtType>('jwt');
@@ -25,7 +27,6 @@ import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
           },
         };
       },
-      inject: [ConfigService],
     }),
     PassportModule,
     BcryptjsModule,
