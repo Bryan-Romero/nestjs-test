@@ -14,7 +14,6 @@ import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { FindAllResDto } from './dto/find-all-res.dto';
 import { generateRandomPassword } from 'src/common/utils/generate-random-pass';
 import { UserRequest } from 'src/common/interfaces';
-import { MeResDto } from './dto/me-res.dto';
 
 @Injectable()
 export class UserService {
@@ -23,16 +22,17 @@ export class UserService {
     private readonly bcryptjsService: BcryptjsService,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<CreateUserDto> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const { email } = createUserDto;
-    const existUser = await this.userModel.findOne({
+
+    const findUser = await this.userModel.findOne({
       email,
     });
 
-    if (existUser)
+    if (findUser)
       throw new ConflictException(
         HttpMessage.CONFLICT,
-        `User ${existUser.email} already exists`,
+        `User ${findUser.email} already exists`,
       );
 
     const randomPassword = generateRandomPassword(12);
@@ -97,7 +97,7 @@ export class UserService {
     };
   }
 
-  async me(_id: string): Promise<MeResDto> {
+  async me(_id: string): Promise<User> {
     const user = await this.findUserById({ _id });
 
     return user;
@@ -133,10 +133,10 @@ export class UserService {
     const user = await this.userModel.findOne(
       { email, active: true },
       {
-        age: true,
-        email: true,
-        username: true,
-        password: true,
+        email: 1,
+        username: 1,
+        roles: 1,
+        password: 1,
       },
     );
     if (user) {

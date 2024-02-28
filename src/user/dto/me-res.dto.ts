@@ -1,10 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { UserDocument } from '../entities/user.entity';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { User } from '../entities/user.entity';
 import { Types } from 'mongoose';
 
-export class MeResDto
-  implements Pick<UserDocument, '_id' | 'email' | 'username'>
-{
+export class MeResDto extends PickType(User, [
+  '_id',
+  'email',
+  'username',
+] as const) {
   @ApiProperty({ type: String })
   _id: Types.ObjectId;
 

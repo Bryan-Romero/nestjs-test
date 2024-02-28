@@ -12,14 +12,13 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ParseMongoIdPipe } from 'src/common/pipes';
+import { ParseObjectIdPipe } from 'src/common/pipes';
 import { Auth, GetUser, JwtAuth } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
 import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FindAllResDto } from './dto/find-all-res.dto';
 import { User } from './entities/user.entity';
-import { MeResDto } from './dto/me-res.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -29,11 +28,11 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Create a new user',
-    type: CreateUserDto,
+    type: User,
   })
   @Auth(Role.ADMIN)
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<CreateUserDto> {
+  create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.userService.create(createUserDto);
   }
 
@@ -51,11 +50,11 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get user information authentication',
-    type: MeResDto,
+    type: User,
   })
   @JwtAuth()
   @Get('me')
-  me(@GetUser('_id') _id: string): Promise<MeResDto> {
+  me(@GetUser('_id') _id: string): Promise<User> {
     return this.userService.me(_id);
   }
 
@@ -66,7 +65,7 @@ export class UserController {
   })
   @Auth()
   @Get(':id')
-  findOne(@Param('id', ParseMongoIdPipe) id: string): Promise<User> {
+  findOne(@Param('id', ParseObjectIdPipe) id: string): Promise<User> {
     return this.userService.findOne(id);
   }
 
@@ -78,7 +77,7 @@ export class UserController {
   @Auth(Role.USER)
   @Patch(':id')
   update(
-    @Param('id', ParseMongoIdPipe) id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     return this.userService.update(id, updateUserDto);
@@ -91,7 +90,7 @@ export class UserController {
   })
   @Auth(Role.USER)
   @Delete(':id')
-  remove(@Param('id', ParseMongoIdPipe) id: string): Promise<MessageResDto> {
+  remove(@Param('id', ParseObjectIdPipe) id: string): Promise<MessageResDto> {
     return this.userService.remove(id);
   }
 }

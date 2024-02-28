@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { MessageResDto } from 'src/common/dto';
-import { UserDocument } from 'src/user/entities/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { HttpMessage } from 'src/common/enums';
 import { JwtForgotPassPayload } from 'src/common/interfaces';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -113,7 +113,7 @@ export class UserPasswordService {
     };
   }
 
-  async getForgotPasswordToken(user: UserDocument): Promise<string> {
+  async getForgotPasswordToken(user: User): Promise<string> {
     const { email, _id, password } = user;
     const payload: JwtForgotPassPayload = {
       sub: _id.toString(),

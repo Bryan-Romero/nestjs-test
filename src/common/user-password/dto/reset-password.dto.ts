@@ -1,5 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { IsMongoId, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 import { SignUpDto } from '../../../auth/dto/sign-up.dto';
 
 export class ResetPasswordDto extends PickType(SignUpDto, [

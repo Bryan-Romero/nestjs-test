@@ -7,7 +7,7 @@ export class SignUpDto extends PickType(User, [
   'username',
   'email',
   'password',
-]) {
+] as const) {
   @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()

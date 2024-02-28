@@ -1,9 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model, HydratedDocumentFromSchema } from 'mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
 import { Role } from 'src/common/enums';
 
 @Schema({ timestamps: true })
 export class User {
+  _id: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+
   @Prop({ type: Boolean, default: true, select: false })
   active: boolean;
 
@@ -42,4 +46,4 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 export type UserDocument = HydratedDocument<User>;
-export type UserModel = Model<UserDocument>;
+export type UserModel = Model<User>;

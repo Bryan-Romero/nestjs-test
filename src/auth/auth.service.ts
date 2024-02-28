@@ -173,10 +173,7 @@ export class AuthService implements OnModuleInit {
     };
   }
 
-  async accessRes(user: {
-    _id: Types.ObjectId;
-    email: string;
-  }): Promise<AccessResDto> {
+  async accessRes(user: Pick<User, '_id' | 'email'>): Promise<AccessResDto> {
     const { _id, email } = user;
     const { access_token, refresh_token } = await this.getTokens({
       sub: _id.toString(),
