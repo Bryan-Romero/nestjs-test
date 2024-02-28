@@ -16,6 +16,12 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<CustomResponse<T>> {
-    return next.handle().pipe(map((data) => ({ data, error: null })));
+    return next.handle().pipe(
+      map((data) => ({
+        data,
+        statusCode: context.switchToHttp().getResponse().statusCode,
+        error: null,
+      })),
+    );
   }
 }

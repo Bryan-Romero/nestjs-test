@@ -17,18 +17,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
-    var responseBody: CustomResponse<null> = { data: null, error: null };
+    var responseBody: CustomResponse<null> = {
+      data: null,
+      error: null,
+      statusCode: null,
+    };
     var status: number = HttpStatus.INTERNAL_SERVER_ERROR;
 
     if (exception instanceof HttpException) {
       responseBody = {
         data: null,
+        statusCode: exception.getStatus(),
         error: exception.getResponse(),
       };
       status = exception.getStatus();
     } else {
       responseBody = {
         data: null,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         error: new InternalServerErrorException().getResponse(),
       };
     }
