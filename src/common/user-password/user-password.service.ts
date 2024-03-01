@@ -4,19 +4,19 @@ import {
   HttpException,
   Injectable,
 } from '@nestjs/common';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { MessageResDto } from 'src/common/dto';
-import { User } from 'src/user/entities/user.entity';
-import { HttpMessage } from 'src/common/enums';
-import { JwtForgotPassPayload } from 'src/common/interfaces';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { MailService } from 'src/common/mail/mail.service';
+import { JwtService } from '@nestjs/jwt';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
-import { UserService } from 'src/user/user.service';
-import { UpdatePasswordDto } from './dto/update-password.dto';
+import { MessageResDto } from 'src/common/dto';
+import { ExceptionMessage, StandardMessage } from 'src/common/enums';
+import { JwtForgotPassPayload } from 'src/common/interfaces';
+import { MailService } from 'src/common/mail/mail.service';
 import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
+import { User } from 'src/user/entities/user.entity';
+import { UserService } from 'src/user/user.service';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UserPasswordService {
@@ -42,7 +42,7 @@ export class UserPasswordService {
     await this.mailService.sendForgotPassword(user, forgotPasswordToken);
 
     return {
-      message: HttpMessage.SUCCESS,
+      message: StandardMessage.SUCCESS,
     };
   }
 
@@ -66,13 +66,13 @@ export class UserPasswordService {
 
       if (user.email !== email || user._id.toString() !== sub)
         throw new BadRequestException(
-          HttpMessage.BAD_REQUEST,
+          ExceptionMessage.BAD_REQUEST,
           'Email do not match',
         );
 
       if (password !== confirmPassword)
         throw new BadRequestException(
-          HttpMessage.BAD_REQUEST,
+          ExceptionMessage.BAD_REQUEST,
           'Passwords do not match',
         );
 
@@ -81,12 +81,12 @@ export class UserPasswordService {
       await user.save();
 
       return {
-        message: HttpMessage.SUCCESS,
+        message: StandardMessage.SUCCESS,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
 
-      throw new ForbiddenException(HttpMessage.ACCESS_DENIED, 'Invalid token');
+      throw new ForbiddenException(ExceptionMessage.FORBIDDEN, 'Invalid token');
     }
   }
 
@@ -100,7 +100,7 @@ export class UserPasswordService {
     const { password, confirmPassword } = updatePasswordDto;
     if (password !== confirmPassword)
       throw new BadRequestException(
-        HttpMessage.BAD_REQUEST,
+        ExceptionMessage.BAD_REQUEST,
         'Passwords do not match',
       );
 
@@ -109,7 +109,7 @@ export class UserPasswordService {
     await user.save();
 
     return {
-      message: HttpMessage.SUCCESS,
+      message: StandardMessage.SUCCESS,
     };
   }
 

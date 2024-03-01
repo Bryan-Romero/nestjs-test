@@ -1,26 +1,29 @@
 import {
-  Controller,
-  Post,
   Body,
-  HttpStatus,
+  Controller,
   HttpCode,
+  HttpStatus,
   Patch,
+  Post,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { SignInDto } from './dto/sign-in.dto';
-import { SignUpDto } from './dto/sign-up.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AccessResDto } from './dto/access-res.dto';
 import {
+  ApiKey,
+  GetToken,
   GetUser,
   JwtAuth,
   JwtRefreshAuth,
   LocalAuth,
 } from 'src/common/decorators';
-import { UserRequest } from 'src/common/interfaces';
 import { MessageResDto } from 'src/common/dto';
+import { UserRequest } from 'src/common/interfaces';
+import { AuthService } from './auth.service';
+import { AccessResDto } from './dto/access-res.dto';
 import { EmailVerifiedDto } from './dto/email-verified.dto';
+import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 
+@ApiKey()
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -68,9 +71,9 @@ export class AuthController {
   @Post('refresh-tokens')
   refreshTokens(
     @GetUser('_id') _id: string,
-    @GetUser('refresh_token') refresh_token: string,
+    @GetToken() token: string,
   ): Promise<AccessResDto> {
-    return this.authService.refreshTokens(_id, refresh_token);
+    return this.authService.refreshTokens(_id, token);
   }
 
   @ApiResponse({

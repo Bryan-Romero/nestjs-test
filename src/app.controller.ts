@@ -1,8 +1,10 @@
 import { Controller, Get, HttpStatus, UseInterceptors } from '@nestjs/common';
-import { AppService } from './app.service';
-import { LoggingInterceptor, TimeoutInterceptor } from './common/interceptors';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AppService } from './app.service';
+import { ApiKey } from './common/decorators';
+import { LoggingInterceptor, TimeoutInterceptor } from './common/interceptors';
 
+@ApiKey()
 @ApiTags('App')
 @UseInterceptors(LoggingInterceptor, TimeoutInterceptor)
 @Controller()

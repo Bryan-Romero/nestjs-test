@@ -7,6 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import { ConfigurationType } from './config/configuration.interface';
+import { X_API_KEY } from './common/guards';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -45,6 +46,7 @@ async function bootstrap() {
     .setDescription('The Nest-Test API description')
     .setVersion('1.0')
     .addBearerAuth()
+    .addApiKey({ type: 'apiKey', name: X_API_KEY, in: 'header' }, X_API_KEY)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);

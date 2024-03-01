@@ -7,13 +7,14 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserPasswordService } from './user-password.service';
 import { MessageResDto } from 'src/common/dto';
+import { ApiKey, GetUser, JwtAuth } from '../decorators';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { GetUser, JwtAuth } from '../decorators';
+import { UserPasswordService } from './user-password.service';
 
+@ApiKey()
 @ApiTags('User Password')
 @Controller('user-password')
 export class UserPasswordController {

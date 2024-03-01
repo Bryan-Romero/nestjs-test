@@ -4,26 +4,25 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_INTERCEPTOR, APP_GUARD, APP_FILTER } from '@nestjs/core';
+import { AuthModule } from './auth/auth.module';
+import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
 import { AllExceptionsFilter } from './common/filters';
 import { TransformInterceptor } from './common/interceptors';
-import { ApiKeyGuard } from './common/guards';
-import { UserModule } from './user/user.module';
-import { LoggerMiddleware } from './common/middlewares';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module';
-import { configuration } from './config/configuration';
-import { validationSchema } from './config/validation';
-import { MongooseModule } from '@nestjs/mongoose';
-import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
 import { MailModule } from './common/mail/mail.module';
+import { LoggerMiddleware } from './common/middlewares';
 import { UserPasswordModule } from './common/user-password/user-password.module';
+import { configuration } from './config/configuration';
 import {
   ConfigurationType,
   DatabaseType,
 } from './config/configuration.interface';
+import { validationSchema } from './config/validation';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -58,10 +57,6 @@ import {
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: ApiKeyGuard,
     },
   ],
 })

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { UserPasswordService } from './user-password.service';
-import { UserPasswordController } from './user-password.controller';
 import { BcryptjsModule } from '../bcryptjs/bcryptjs.module';
+import { UserPasswordController } from './user-password.controller';
+import { UserPasswordService } from './user-password.service';
 
 @Module({
   imports: [BcryptjsModule],

@@ -1,18 +1,18 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '../interfaces';
-import { HttpMessage } from '../enums';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '../decorators';
-import { CustomRequest } from '../interfaces/custom-request.interface';
-import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
 import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
+import { UserService } from 'src/user/user.service';
+import { IS_PUBLIC_KEY } from '../decorators';
+import { ExceptionMessage } from '../enums';
+import { JwtPayload } from '../interfaces';
+import { CustomRequest } from '../interfaces/custom-request.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -35,8 +35,8 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<CustomRequest>();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException(
-        HttpMessage.UNAUTHORIZED,
+      throw new ForbiddenException(
+        ExceptionMessage.FORBIDDEN,
         'Token not found',
       );
     }
@@ -55,10 +55,7 @@ export class AuthGuard implements CanActivate {
         username,
       };
     } catch {
-      throw new UnauthorizedException(
-        HttpMessage.UNAUTHORIZED,
-        'Invalid token',
-      );
+      throw new ForbiddenException(ExceptionMessage.FORBIDDEN, 'Invalid token');
     }
     return true;
   }

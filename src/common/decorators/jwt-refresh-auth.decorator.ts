@@ -1,15 +1,11 @@
 import { UseGuards, applyDecorators } from '@nestjs/common';
+import { ApiBearerAuth, ApiForbiddenResponse } from '@nestjs/swagger';
+import { ExceptionMessage } from '../enums';
 import { JwtRefreshAuthGuard } from '../guards';
-import {
-  ApiBearerAuth,
-  ApiForbiddenResponse,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
 
 export const JwtRefreshAuth = () =>
   applyDecorators(
     ApiBearerAuth(),
-    ApiForbiddenResponse({ description: 'Unauthorized' }),
-    ApiUnauthorizedResponse({ description: 'Forbidden' }),
+    ApiForbiddenResponse({ description: ExceptionMessage.FORBIDDEN }),
     UseGuards(JwtRefreshAuthGuard),
   );

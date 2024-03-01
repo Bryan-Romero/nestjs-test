@@ -3,17 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { PipelineStage, ProjectionType } from 'mongoose';
-import { User, UserDocument, UserModel } from './entities/user.entity';
-import { HttpMessage, Role } from 'src/common/enums';
-import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
-import { FindAllResDto } from './dto/find-all-res.dto';
-import { generateRandomPassword } from 'src/common/utils/generate-random-pass';
+import { MessageResDto, PaginationDto } from 'src/common/dto';
+import { ExceptionMessage, Role, StandardMessage } from 'src/common/enums';
 import { UserRequest } from 'src/common/interfaces';
+import { generateRandomPassword } from 'src/common/utils/generate-random-pass';
+import { CreateUserDto } from './dto/create-user.dto';
+import { FindAllResDto } from './dto/find-all-res.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User, UserDocument, UserModel } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -31,7 +31,7 @@ export class UserService {
 
     if (findUser)
       throw new ConflictException(
-        HttpMessage.CONFLICT,
+        ExceptionMessage.CONFLICT,
         `User ${findUser.email} already exists`,
       );
 
@@ -126,7 +126,7 @@ export class UserService {
     user.active = false;
     await user.save();
 
-    return { message: HttpMessage.SUCCESS };
+    return { message: StandardMessage.SUCCESS };
   }
 
   async validateUser(email: string, password: string): Promise<UserRequest> {
@@ -166,7 +166,7 @@ export class UserService {
 
     if (!user && whitException)
       throw new NotFoundException(
-        HttpMessage.NOT_FOUND,
+        ExceptionMessage.NOT_FOUND,
         `User with email ${email} does not exist`,
       );
 
@@ -186,7 +186,7 @@ export class UserService {
 
     if (!user && whitException)
       throw new NotFoundException(
-        HttpMessage.NOT_FOUND,
+        ExceptionMessage.NOT_FOUND,
         `User with _id ${_id} does not exist`,
       );
 

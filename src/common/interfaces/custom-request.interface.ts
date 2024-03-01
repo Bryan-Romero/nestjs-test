@@ -6,9 +6,7 @@ export interface CustomRequest extends Request {
 }
 
 export interface UserRequest
-  extends Pick<User, '_id' | 'email' | 'roles' | 'username'> {
-  refresh_token?: string;
-}
+  extends Pick<User, '_id' | 'email' | 'roles' | 'username'> {}
 
 // Archivo donde defines la extensión del objeto Request
 // import { Request } from 'express';

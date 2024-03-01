@@ -1,10 +1,10 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload, UserRequest } from 'src/common/interfaces';
-import { UserService } from 'src/user/user.service';
 import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
+import { UserService } from 'src/user/user.service';
 
 // Nuestra estrategia Jwt Passport tiene un nombre predeterminado de 'jwt'
 @Injectable()

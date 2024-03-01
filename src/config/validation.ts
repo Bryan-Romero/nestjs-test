@@ -1,9 +1,10 @@
 import * as Joi from 'joi';
 import { Role } from 'src/common/enums';
+import { NodeEnv } from './node-env.enum';
 
 export const validationSchema = Joi.object({
   // api
-  NODE_ENV: Joi.string().valid('development', 'production'),
+  NODE_ENV: Joi.string().valid(...Object.values(NodeEnv)),
   PORT: Joi.number().default(3000),
   API_KEY: Joi.string().required(),
   PREFIX: Joi.string().required(),

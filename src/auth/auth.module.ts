@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
 import {
   JwtRefreshStrategy,
   JwtStrategy,
   LocalStrategy,
 } from 'src/common/strategies';
 import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [

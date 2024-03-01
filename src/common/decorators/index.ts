@@ -6,3 +6,4 @@ export * from './get-user.decorator';
 export * from './local-auth.decorator';
 export * from './jwt-auth.decorator';
 export * from './jwt-refresh-auth.decorator';
+export * from './get-token.decorator';

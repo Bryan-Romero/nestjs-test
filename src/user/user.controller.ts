@@ -1,25 +1,26 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  Query,
+  Get,
   HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ParseObjectIdPipe } from 'src/common/pipes';
-import { Auth, GetUser, JwtAuth } from 'src/common/decorators';
-import { Role } from 'src/common/enums';
-import { PaginationDto, MessageResDto } from 'src/common/dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiKey, Auth, GetUser, JwtAuth } from 'src/common/decorators';
+import { MessageResDto, PaginationDto } from 'src/common/dto';
+import { Role } from 'src/common/enums';
+import { ParseObjectIdPipe } from 'src/common/pipes';
+import { CreateUserDto } from './dto/create-user.dto';
 import { FindAllResDto } from './dto/find-all-res.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { UserService } from './user.service';
 
+@ApiKey()
 @ApiTags('User')
 @Controller('user')
 export class UserController {

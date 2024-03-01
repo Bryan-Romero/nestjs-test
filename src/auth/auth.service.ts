@@ -5,26 +5,26 @@ import {
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
-import { SignInDto } from './dto/sign-in.dto';
-import { SignUpDto } from './dto/sign-up.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserModel } from 'src/user/entities/user.entity';
-import { Types } from 'mongoose';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { JwtPayload, UserRequest } from 'src/common/interfaces';
-import { HttpMessage } from 'src/common/enums';
+import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
-import { AccessResDto } from './dto/access-res.dto';
 import { MessageResDto } from 'src/common/dto';
+import { ExceptionMessage, StandardMessage } from 'src/common/enums';
+import { JwtPayload, UserRequest } from 'src/common/interfaces';
 import { MailService } from 'src/common/mail/mail.service';
-import { v4 as uuidv4 } from 'uuid';
-import { EmailVerifiedDto } from './dto/email-verified.dto';
 import {
   ConfigurationType,
   DefaultUserType,
   JwtType,
 } from 'src/config/configuration.interface';
+import { User, UserModel } from 'src/user/entities/user.entity';
+import { v4 as uuidv4 } from 'uuid';
+import { AccessResDto } from './dto/access-res.dto';
+import { EmailVerifiedDto } from './dto/email-verified.dto';
+import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -49,7 +49,7 @@ export class AuthService implements OnModuleInit {
         password: true,
       },
     );
-    if (!user) throw new ForbiddenException(HttpMessage.ACCESS_DENIED);
+    if (!user) throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
 
     // Validate password
     const isPasswordValid = await this.bcryptjsService.compareStringHash(
@@ -57,7 +57,7 @@ export class AuthService implements OnModuleInit {
       user.password,
     );
     if (!isPasswordValid)
-      throw new ForbiddenException(HttpMessage.ACCESS_DENIED);
+      throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
 
     return await this.accessRes(user);
   }
@@ -73,7 +73,7 @@ export class AuthService implements OnModuleInit {
     const existUser = await this.userModel.findOne({ email });
     if (existUser)
       throw new ConflictException(
-        HttpMessage.CONFLICT,
+        ExceptionMessage.CONFLICT,
         `User ${existUser.email} already exists`,
       );
 
@@ -92,23 +92,20 @@ export class AuthService implements OnModuleInit {
     return await this.accessRes(user);
   }
 
-  async refreshTokens(
-    _id: string,
-    refresh_token: string,
-  ): Promise<AccessResDto> {
+  async refreshTokens(_id: string, token: string): Promise<AccessResDto> {
     const user = await this.userModel.findOne(
       { _id },
       { email: 1, hashRefreshToken: 1 },
     );
     if (!user || !user.hashRefreshToken)
-      throw new ForbiddenException(HttpMessage.ACCESS_DENIED);
+      throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
 
     const isRefreshTokenValid = await this.bcryptjsService.compareStringHash(
-      refresh_token,
+      token,
       user.hashRefreshToken,
     );
     if (!isRefreshTokenValid)
-      throw new ForbiddenException(HttpMessage.ACCESS_DENIED);
+      throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
 
     return await this.accessRes(user);
   }
@@ -123,7 +120,7 @@ export class AuthService implements OnModuleInit {
       },
     );
     return {
-      message: HttpMessage.SUCCESS,
+      message: StandardMessage.SUCCESS,
     };
   }
 
@@ -138,7 +135,7 @@ export class AuthService implements OnModuleInit {
     });
     if (!user)
       throw new NotFoundException(
-        HttpMessage.NOT_FOUND,
+        ExceptionMessage.NOT_FOUND,
         `User with emailVerifiedToken ${token} does not exist`,
       );
 
@@ -146,7 +143,7 @@ export class AuthService implements OnModuleInit {
     user.emailVerified = true;
     await user.save();
 
-    return { message: HttpMessage.SUCCESS };
+    return { message: StandardMessage.SUCCESS };
   }
 
   async resendVerificationEmail(email: string): Promise<MessageResDto> {
@@ -156,7 +153,7 @@ export class AuthService implements OnModuleInit {
     );
     if (!user)
       throw new NotFoundException(
-        HttpMessage.NOT_FOUND,
+        ExceptionMessage.NOT_FOUND,
         `User with email ${email} does not exist`,
       );
 
@@ -169,7 +166,7 @@ export class AuthService implements OnModuleInit {
     await this.mailService.sendUserConfirmation(user, user.emailVerifiedToken);
 
     return {
-      message: HttpMessage.SUCCESS,
+      message: StandardMessage.SUCCESS,
     };
   }
 

@@ -1,8 +1,8 @@
-import { Strategy } from 'passport-local';
-import { PassportStrategy } from '@nestjs/passport';
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy } from 'passport-local';
+import { ExceptionMessage } from 'src/common/enums';
 import { UserService } from 'src/user/user.service';
-import { HttpMessage } from 'src/common/enums';
 import { UserRequest } from '../interfaces';
 
 // Nuestra estrategia local Passport tiene un nombre predeterminado de 'local'
@@ -18,7 +18,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   async validate(email: string, password: string): Promise<UserRequest> {
     const user = await this.userService.validateUser(email, password);
     if (!user) {
-      throw new ForbiddenException(HttpMessage.ACCESS_DENIED);
+      throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
     }
 
     return user;
