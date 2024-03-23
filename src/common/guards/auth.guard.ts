@@ -46,7 +46,7 @@ export class AuthGuard implements CanActivate {
         secret,
       });
       // Find user by id with exception if not found
-      const user = await this.userService.findUserById({ _id: sub });
+      const user = await this.userService.findUserById(sub);
       const { _id, email, roles, username } = user;
       request.user = {
         email,

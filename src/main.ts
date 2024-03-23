@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { logger } from './common/middlewares';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -8,6 +8,8 @@ import helmet from 'helmet';
 import * as compression from 'compression';
 import { ConfigurationType } from './config/configuration.interface';
 import { X_API_KEY } from './common/guards';
+import { ValidationError } from 'class-validator';
+import { ExceptionMessage } from './common/enums';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,6 +33,20 @@ async function bootstrap() {
       transform: true,
       transformOptions: {
         enableImplicitConversion: true,
+      },
+      exceptionFactory: (errors: ValidationError[]) => {
+        const messages = errors.map((error) => {
+          const constraints = error.constraints;
+          if (constraints) {
+            return Object.values(constraints).join(', ');
+          } else {
+            return `${error.property} has an invalid value`;
+          }
+        });
+        throw new BadRequestException(
+          messages.join(', '),
+          ExceptionMessage.BAD_REQUEST,
+        );
       },
     }),
   );

@@ -98,19 +98,19 @@ export class UserService {
   }
 
   async me(_id: string): Promise<User> {
-    const user = await this.findUserById({ _id });
+    const user = await this.findUserById(_id);
 
     return user;
   }
 
   async findOne(_id: string): Promise<User> {
-    const user = await this.findUserById({ _id });
+    const user = await this.findUserById(_id);
 
     return user;
   }
 
   async update(_id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findUserById({ _id });
+    const user = await this.findUserById(_id);
 
     const { age, username } = updateUserDto;
     user.age = age;
@@ -121,7 +121,7 @@ export class UserService {
   }
 
   async remove(_id: string): Promise<MessageResDto> {
-    const user = await this.findUserById({ _id });
+    const user = await this.findUserById(_id);
 
     user.active = false;
     await user.save();
@@ -132,12 +132,7 @@ export class UserService {
   async validateUser(email: string, password: string): Promise<UserRequest> {
     const user = await this.userModel.findOne(
       { email, active: true },
-      {
-        email: 1,
-        username: 1,
-        roles: 1,
-        password: 1,
-      },
+      '+password',
     );
     if (user) {
       // Validate password
@@ -153,12 +148,11 @@ export class UserService {
     return null;
   }
 
-  async findUserByEmail(props: {
-    email: string;
-    projection?: ProjectionType<User>;
-    whitException?: boolean;
-  }): Promise<UserDocument> {
-    const { email, projection, whitException = true } = props;
+  async findUserByEmail(
+    email: string,
+    projection?: ProjectionType<User>,
+    whitException = true,
+  ): Promise<UserDocument> {
     const user = await this.userModel.findOne(
       { email, active: true },
       projection,
@@ -173,12 +167,11 @@ export class UserService {
     return user || null;
   }
 
-  async findUserById(props: {
-    _id: string;
-    projection?: ProjectionType<User>;
-    whitException?: boolean;
-  }): Promise<UserDocument> {
-    const { _id, projection, whitException = true } = props;
+  async findUserById(
+    _id: string,
+    projection?: ProjectionType<User>,
+    whitException = true,
+  ): Promise<UserDocument> {
     const user = await this.userModel.findOne(
       { _id, active: true },
       projection,

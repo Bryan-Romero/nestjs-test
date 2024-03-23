@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
+import { randomUUID } from 'crypto';
 import { Types } from 'mongoose';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { MessageResDto } from 'src/common/dto';
@@ -20,7 +21,6 @@ import {
   JwtType,
 } from 'src/config/configuration.interface';
 import { User, UserModel } from 'src/user/entities/user.entity';
-import { v4 as uuidv4 } from 'uuid';
 import { AccessResDto } from './dto/access-res.dto';
 import { EmailVerifiedDto } from './dto/email-verified.dto';
 import { SignInDto } from './dto/sign-in.dto';
@@ -78,7 +78,7 @@ export class AuthService implements OnModuleInit {
       );
 
     const hash = await this.bcryptjsService.hashData(password);
-    const emailVerifiedToken = uuidv4();
+    const emailVerifiedToken = randomUUID();
     const user = await this.userModel.create({
       username,
       email,
@@ -93,10 +93,7 @@ export class AuthService implements OnModuleInit {
   }
 
   async refreshTokens(_id: string, token: string): Promise<AccessResDto> {
-    const user = await this.userModel.findOne(
-      { _id },
-      { email: 1, hashRefreshToken: 1 },
-    );
+    const user = await this.userModel.findOne({ _id }, '+hashRefreshToken');
     if (!user || !user.hashRefreshToken)
       throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
 
@@ -149,7 +146,7 @@ export class AuthService implements OnModuleInit {
   async resendVerificationEmail(email: string): Promise<MessageResDto> {
     const user = await this.userModel.findOne(
       { email, active: true },
-      { username: 1, email: 1, emailVerifiedToken: 1 },
+      '+emailVerifiedToken',
     );
     if (!user)
       throw new NotFoundException(
@@ -158,7 +155,7 @@ export class AuthService implements OnModuleInit {
       );
 
     if (!user.emailVerifiedToken) {
-      const emailVerifiedToken = uuidv4();
+      const emailVerifiedToken = randomUUID();
       user.emailVerifiedToken = emailVerifiedToken;
       await user.save();
     }
