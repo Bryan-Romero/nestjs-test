@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: JwtPayload): Promise<UserRequest> {
     const { sub } = payload;
     // Find user by id with exception if not found
-    const user = await this.userService.findUserById({ _id: sub });
+    const user = await this.userService.findUserById(sub);
 
     const { _id, email, roles, username } = user;
     return {

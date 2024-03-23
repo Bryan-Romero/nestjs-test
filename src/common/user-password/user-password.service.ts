@@ -33,10 +33,7 @@ export class UserPasswordService {
   ): Promise<MessageResDto> {
     const { email } = forgotPasswordDto;
     // Find user by email with exception if not found
-    const user = await this.userService.findUserByEmail({
-      email,
-      projection: { username: 1, email: 1, password: 1 },
-    });
+    const user = await this.userService.findUserByEmail(email, '+password');
 
     const forgotPasswordToken = await this.getForgotPasswordToken(user);
     await this.mailService.sendForgotPassword(user, forgotPasswordToken);
@@ -52,10 +49,7 @@ export class UserPasswordService {
     try {
       const { _id, password, confirmPassword, token } = resetPasswordDto;
       // Find user by id with exception if not found
-      const user = await this.userService.findUserById({
-        _id,
-        projection: { email: 1, password: 1 },
-      });
+      const user = await this.userService.findUserById(_id, '+password');
 
       const secret =
         this.configService.get<JwtType>('jwt').secret + user.password;
@@ -66,14 +60,14 @@ export class UserPasswordService {
 
       if (user.email !== email || user._id.toString() !== sub)
         throw new BadRequestException(
-          ExceptionMessage.BAD_REQUEST,
           'Email do not match',
+          ExceptionMessage.BAD_REQUEST,
         );
 
       if (password !== confirmPassword)
         throw new BadRequestException(
-          ExceptionMessage.BAD_REQUEST,
           'Passwords do not match',
+          ExceptionMessage.BAD_REQUEST,
         );
 
       const hash = await this.bcryptjsService.hashData(password);
@@ -86,7 +80,7 @@ export class UserPasswordService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
 
-      throw new ForbiddenException(ExceptionMessage.FORBIDDEN, 'Invalid token');
+      throw new ForbiddenException('Invalid token', ExceptionMessage.FORBIDDEN);
     }
   }
 
@@ -95,13 +89,13 @@ export class UserPasswordService {
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<MessageResDto> {
     // Find user by id with exception if not found
-    const user = await this.userService.findUserById({ _id });
+    const user = await this.userService.findUserById(_id);
 
     const { password, confirmPassword } = updatePasswordDto;
     if (password !== confirmPassword)
       throw new BadRequestException(
-        ExceptionMessage.BAD_REQUEST,
         'Passwords do not match',
+        ExceptionMessage.BAD_REQUEST,
       );
 
     const hash = await this.bcryptjsService.hashData(password);

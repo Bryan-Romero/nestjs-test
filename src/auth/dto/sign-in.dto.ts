@@ -1,14 +1,16 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
+import { Field, InputType } from '@nestjs/graphql';
+import { PickType } from '@nestjs/mapped-types';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { User } from 'src/user/entities/user.entity';
 
+@InputType()
 export class SignInDto extends PickType(User, ['email', 'password'] as const) {
-  @ApiProperty({ type: String })
+  @Field(() => String)
   @IsEmail()
   email: string;
 
-  @ApiProperty({ type: String })
+  @Field(() => String)
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value.trim())

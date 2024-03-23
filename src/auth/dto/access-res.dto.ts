@@ -1,17 +1,14 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { Types } from 'mongoose';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { User } from 'src/user/entities/user.entity';
 
-export class AccessResDto extends PickType(User, ['_id', 'email'] as const) {
-  @ApiProperty({ type: String })
-  _id: Types.ObjectId;
-
-  @ApiProperty({ type: String })
-  email: string;
-
-  @ApiProperty({ type: String })
+@ObjectType()
+export class AccessResDto {
+  @Field(() => String)
   access_token: string;
 
-  @ApiProperty({ type: String })
+  @Field(() => String)
   refresh_token: string;
+
+  @Field(() => User, { nullable: true })
+  user?: User;
 }

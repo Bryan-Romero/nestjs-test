@@ -2,7 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
 import { User, UserSchema } from './entities/user.entity';
-import { UserController } from './user.controller';
+import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
 
 @Global()
@@ -11,8 +11,7 @@ import { UserService } from './user.service';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     BcryptjsModule,
   ],
-  controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, UserResolver],
   exports: [
     UserService,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),

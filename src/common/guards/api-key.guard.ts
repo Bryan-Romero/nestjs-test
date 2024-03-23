@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { ConfigurationType } from 'src/config/configuration.interface';
 import { ExceptionMessage } from '../enums';
 
@@ -16,7 +17,8 @@ export class ApiKeyGuard implements CanActivate {
     private readonly configService: ConfigService<ConfigurationType>,
   ) {}
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+    const ctx = GqlExecutionContext.create(context);
+    const request = ctx.getContext().req;
 
     const apiKey = Array.isArray(request.headers[X_API_KEY])
       ? request.headers[X_API_KEY][0]
@@ -24,8 +26,8 @@ export class ApiKeyGuard implements CanActivate {
 
     if (!this.validApyKeyFromHeader(apiKey)) {
       throw new UnauthorizedException(
-        ExceptionMessage.UNAUTHORIZED,
         'Invalid API Key',
+        ExceptionMessage.UNAUTHORIZED,
       );
     }
     return true;

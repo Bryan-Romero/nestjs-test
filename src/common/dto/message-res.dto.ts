@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { Field, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
 export class MessageResDto {
-  @ApiProperty({ type: String })
-  message: string;
+  @Field(() => String, { nullable: true })
+  message?: string;
 }

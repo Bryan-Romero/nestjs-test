@@ -3,13 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { BcryptjsModule } from 'src/common/bcryptjs/bcryptjs.module';
-import {
-  JwtRefreshStrategy,
-  JwtStrategy,
-  LocalStrategy,
-} from 'src/common/strategies';
+import { JwtRefreshStrategy, JwtStrategy } from 'src/common/strategies';
 import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
-import { AuthController } from './auth.controller';
+import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 
 @Module({
@@ -31,7 +27,6 @@ import { AuthService } from './auth.service';
     PassportModule,
     BcryptjsModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
+  providers: [AuthService, AuthResolver, JwtStrategy, JwtRefreshStrategy],
 })
 export class AuthModule {}

@@ -4,15 +4,17 @@ import {
   Injectable,
   NotFoundException,
   OnModuleInit,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
+import { randomUUID } from 'crypto';
 import { Types } from 'mongoose';
 import { BcryptjsService } from 'src/common/bcryptjs/bcryptjs.service';
 import { MessageResDto } from 'src/common/dto';
 import { ExceptionMessage, StandardMessage } from 'src/common/enums';
-import { JwtPayload, UserRequest } from 'src/common/interfaces';
+import { JwtPayload } from 'src/common/interfaces';
 import { MailService } from 'src/common/mail/mail.service';
 import {
   ConfigurationType,
@@ -20,7 +22,6 @@ import {
   JwtType,
 } from 'src/config/configuration.interface';
 import { User, UserModel } from 'src/user/entities/user.entity';
-import { v4 as uuidv4 } from 'uuid';
 import { AccessResDto } from './dto/access-res.dto';
 import { EmailVerifiedDto } from './dto/email-verified.dto';
 import { SignInDto } from './dto/sign-in.dto';
@@ -42,14 +43,13 @@ export class AuthService implements OnModuleInit {
     // Validate if email exists
     const user = await this.userModel.findOne(
       { email, active: true },
-      {
-        age: true,
-        email: true,
-        username: true,
-        password: true,
-      },
+      '+password',
     );
-    if (!user) throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
+    if (!user)
+      throw new UnauthorizedException(
+        'Unauthorized access',
+        ExceptionMessage.UNAUTHORIZED,
+      );
 
     // Validate password
     const isPasswordValid = await this.bcryptjsService.compareStringHash(
@@ -57,12 +57,11 @@ export class AuthService implements OnModuleInit {
       user.password,
     );
     if (!isPasswordValid)
-      throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
+      throw new UnauthorizedException(
+        'Unauthorized access',
+        ExceptionMessage.UNAUTHORIZED,
+      );
 
-    return await this.accessRes(user);
-  }
-
-  async login(user: UserRequest): Promise<AccessResDto> {
     return await this.accessRes(user);
   }
 
@@ -73,12 +72,12 @@ export class AuthService implements OnModuleInit {
     const existUser = await this.userModel.findOne({ email });
     if (existUser)
       throw new ConflictException(
-        ExceptionMessage.CONFLICT,
         `User ${existUser.email} already exists`,
+        ExceptionMessage.CONFLICT,
       );
 
     const hash = await this.bcryptjsService.hashData(password);
-    const emailVerifiedToken = uuidv4();
+    const emailVerifiedToken = randomUUID();
     const user = await this.userModel.create({
       username,
       email,
@@ -94,18 +93,18 @@ export class AuthService implements OnModuleInit {
 
   async refreshTokens(_id: string, token: string): Promise<AccessResDto> {
     const user = await this.userModel.findOne(
-      { _id },
-      { email: 1, hashRefreshToken: 1 },
+      { _id, active: true },
+      '+hashRefreshToken',
     );
     if (!user || !user.hashRefreshToken)
-      throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
+      throw new ForbiddenException('Access Denied', ExceptionMessage.FORBIDDEN);
 
     const isRefreshTokenValid = await this.bcryptjsService.compareStringHash(
       token,
       user.hashRefreshToken,
     );
     if (!isRefreshTokenValid)
-      throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
+      throw new ForbiddenException('Access Denied', ExceptionMessage.FORBIDDEN);
 
     return await this.accessRes(user);
   }
@@ -135,8 +134,8 @@ export class AuthService implements OnModuleInit {
     });
     if (!user)
       throw new NotFoundException(
-        ExceptionMessage.NOT_FOUND,
         `User with emailVerifiedToken ${token} does not exist`,
+        ExceptionMessage.NOT_FOUND,
       );
 
     user.emailVerifiedToken = null;
@@ -149,16 +148,16 @@ export class AuthService implements OnModuleInit {
   async resendVerificationEmail(email: string): Promise<MessageResDto> {
     const user = await this.userModel.findOne(
       { email, active: true },
-      { username: 1, email: 1, emailVerifiedToken: 1 },
+      '+emailVerifiedToken',
     );
     if (!user)
       throw new NotFoundException(
-        ExceptionMessage.NOT_FOUND,
         `User with email ${email} does not exist`,
+        ExceptionMessage.NOT_FOUND,
       );
 
     if (!user.emailVerifiedToken) {
-      const emailVerifiedToken = uuidv4();
+      const emailVerifiedToken = randomUUID();
       user.emailVerifiedToken = emailVerifiedToken;
       await user.save();
     }
@@ -170,7 +169,7 @@ export class AuthService implements OnModuleInit {
     };
   }
 
-  async accessRes(user: Pick<User, '_id' | 'email'>): Promise<AccessResDto> {
+  async accessRes(user: User): Promise<AccessResDto> {
     const { _id, email } = user;
     const { access_token, refresh_token } = await this.getTokens({
       sub: _id.toString(),
@@ -180,8 +179,7 @@ export class AuthService implements OnModuleInit {
     await this.updateRefreshToken(_id, refresh_token);
 
     return {
-      _id,
-      email,
+      user,
       access_token,
       refresh_token,
     };

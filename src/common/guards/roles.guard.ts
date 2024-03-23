@@ -5,6 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { ROLES_KEY } from '../decorators';
 import { ExceptionMessage, Role, RoleLevel } from '../enums';
 import { CustomRequest } from '../interfaces';
@@ -14,22 +15,24 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const ctx = GqlExecutionContext.create(context);
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
+      ctx.getHandler(),
+      ctx.getClass(),
     ]);
 
     if (!(requiredRoles.length > 0)) {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<CustomRequest>();
+    const request: CustomRequest = ctx.getContext().req;
 
     const { roles } = request.user;
 
     const hasPrivilege = this.checkUserAuthorization(roles, requiredRoles);
 
-    if (!hasPrivilege) throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
+    if (!hasPrivilege)
+      throw new ForbiddenException('Access denied', ExceptionMessage.FORBIDDEN);
 
     return true;
   }

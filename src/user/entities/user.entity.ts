@@ -1,22 +1,31 @@
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { Role } from 'src/common/enums';
 
+@ObjectType()
 @Schema({ timestamps: true })
 export class User {
+  @Field(() => ID)
   _id: Types.ObjectId;
+  @Field(() => Date)
   createdAt: Date;
+  @Field(() => Date)
   updatedAt: Date;
 
-  @Prop({ type: Boolean, default: true, select: false })
+  @Field(() => Boolean)
+  @Prop({ type: Boolean, default: true })
   active: boolean;
 
-  @Prop({ type: String })
+  @Field(() => String)
+  @Prop({ type: String, required: true })
   username: string;
 
+  @Field(() => Int, { nullable: true })
   @Prop({ type: String })
-  age: number;
+  age?: number;
 
+  @Field(() => String)
   @Prop({
     type: String,
     unique: true,
@@ -31,17 +40,19 @@ export class User {
   @Prop({ type: String, required: true, select: false })
   password: string;
 
+  @Field(() => [String])
   @Prop({ type: [String], enum: Role, default: [Role.USER] })
   roles: Role[];
 
   @Prop({ type: String, select: false })
-  hashRefreshToken: string;
+  hashRefreshToken?: string;
 
+  @Field(() => Boolean)
   @Prop({ type: Boolean, default: false })
   emailVerified: boolean;
 
   @Prop({ type: String, select: false })
-  emailVerifiedToken: string;
+  emailVerifiedToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

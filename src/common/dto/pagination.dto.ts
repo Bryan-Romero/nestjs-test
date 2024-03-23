@@ -1,22 +1,17 @@
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { SortOrder } from 'mongoose';
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { IsInt, IsOptional, Min } from 'class-validator';
 
+@InputType()
 export class PaginationDto {
+  @Field(() => Int, { nullable: true })
   @IsInt()
   @Min(1)
   @IsOptional()
-  limit?: number;
+  limit: number = 10;
 
+  @Field(() => Int, { nullable: true })
   @IsInt()
-  @Min(1)
+  @Min(0)
   @IsOptional()
-  page?: number;
-
-  @IsString()
-  @IsOptional()
-  sort?: SortOrder;
-
-  @IsString()
-  @IsOptional()
-  keyWord?: string;
+  offset: number = 0;
 }

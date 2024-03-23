@@ -31,8 +31,8 @@ export class UserService {
 
     if (findUser)
       throw new ConflictException(
-        ExceptionMessage.CONFLICT,
         `User ${findUser.email} already exists`,
+        ExceptionMessage.CONFLICT,
       );
 
     const randomPassword = generateRandomPassword(12);
@@ -55,14 +55,14 @@ export class UserService {
   }
 
   async findAll(paginationDto: PaginationDto): Promise<FindAllResDto> {
-    const { limit = 10, page = 1 } = paginationDto;
+    const { limit, offset } = paginationDto;
 
     const pipeline: PipelineStage[] = [
       { $match: { active: true, roles: { $in: [Role.USER] } } },
       {
         $facet: {
           data: [
-            { $skip: (page - 1) * limit },
+            { $skip: offset },
             { $limit: limit },
             { $project: { password: 0, roles: 0, active: 0 } },
           ],
@@ -98,30 +98,30 @@ export class UserService {
   }
 
   async me(_id: string): Promise<User> {
-    const user = await this.findUserById({ _id });
+    const user = await this.findUserById(_id);
 
     return user;
   }
 
   async findOne(_id: string): Promise<User> {
-    const user = await this.findUserById({ _id });
+    const user = await this.findUserById(_id);
 
     return user;
   }
 
   async update(_id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findUserById({ _id });
+    const user = await this.findUserById(_id);
 
     const { age, username } = updateUserDto;
-    user.age = age;
-    user.username = username;
+    user.age = age ?? user.age;
+    user.username = username ?? user.username;
     await user.save();
 
     return user;
   }
 
   async remove(_id: string): Promise<MessageResDto> {
-    const user = await this.findUserById({ _id });
+    const user = await this.findUserById(_id);
 
     user.active = false;
     await user.save();
@@ -132,12 +132,7 @@ export class UserService {
   async validateUser(email: string, password: string): Promise<UserRequest> {
     const user = await this.userModel.findOne(
       { email, active: true },
-      {
-        email: 1,
-        username: 1,
-        roles: 1,
-        password: 1,
-      },
+      '+password',
     );
     if (user) {
       // Validate password
@@ -146,19 +141,24 @@ export class UserService {
         user.password,
       );
 
-      const { _id, roles, username } = user;
-      return isPasswordValid ? { _id, email, roles, username } : null;
+      return isPasswordValid
+        ? {
+            _id: user._id,
+            email: user.email,
+            roles: user.roles,
+            username: user.username,
+          }
+        : null;
     }
 
     return null;
   }
 
-  async findUserByEmail(props: {
-    email: string;
-    projection?: ProjectionType<User>;
-    whitException?: boolean;
-  }): Promise<UserDocument> {
-    const { email, projection, whitException = true } = props;
+  async findUserByEmail(
+    email: string,
+    projection?: ProjectionType<User>,
+    whitException = true,
+  ): Promise<UserDocument> {
     const user = await this.userModel.findOne(
       { email, active: true },
       projection,
@@ -166,19 +166,18 @@ export class UserService {
 
     if (!user && whitException)
       throw new NotFoundException(
-        ExceptionMessage.NOT_FOUND,
         `User with email ${email} does not exist`,
+        ExceptionMessage.NOT_FOUND,
       );
 
     return user || null;
   }
 
-  async findUserById(props: {
-    _id: string;
-    projection?: ProjectionType<User>;
-    whitException?: boolean;
-  }): Promise<UserDocument> {
-    const { _id, projection, whitException = true } = props;
+  async findUserById(
+    _id: string,
+    projection?: ProjectionType<User>,
+    whitException = true,
+  ): Promise<UserDocument> {
     const user = await this.userModel.findOne(
       { _id, active: true },
       projection,
@@ -186,8 +185,8 @@ export class UserService {
 
     if (!user && whitException)
       throw new NotFoundException(
-        ExceptionMessage.NOT_FOUND,
         `User with _id ${_id} does not exist`,
+        ExceptionMessage.NOT_FOUND,
       );
 
     return user || null;

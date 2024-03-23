@@ -1,8 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { PaginationResDto } from 'src/common/dto';
 import { User } from '../entities/user.entity';
 
+@ObjectType()
 export class FindAllResDto extends PaginationResDto {
-  @ApiProperty({ type: [User] })
+  @Field(() => [User])
   data: User[];
+
+  @Field(() => Int)
+  total_items: number;
+
+  @Field(() => Int)
+  total_pages: number;
 }
