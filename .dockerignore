@@ -1,5 +1,8 @@
+# Ignore everything
 *
 
+# Allow files and directories
 !package*.json
 !tsconfig*.json
 !/src
+!/static

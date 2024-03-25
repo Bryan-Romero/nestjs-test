@@ -4,48 +4,28 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { join } from 'path';
 import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { BcryptjsModule } from './common/bcryptjs/bcryptjs.module';
-import { GqlConfigModule } from './common/gql-config/gql-config.module';
-import { MailModule } from './common/mail/mail.module';
+import { GqlConfigModule } from './modules/gql-config/gql-config.module';
 import { LoggerMiddleware } from './common/middlewares';
-import { UserPasswordModule } from './common/user-password/user-password.module';
-import { configuration } from './config/configuration';
-import {
-  ConfigurationType,
-  DatabaseType,
-} from './config/configuration.interface';
-import { validationSchema } from './config/validation';
-import { UserModule } from './user/user.module';
+import { MyConfigModule } from './config/my-config.module';
+import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { BcryptjsModule } from './modules/bcryptjs/bcryptjs.module';
+import { MailModule } from './modules/mail/mail.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: [
-        join(process.cwd(), `src/config/env/.env.${process.env.NODE_ENV}`),
-      ],
-      isGlobal: true,
-      load: [configuration],
-      validationSchema,
-    }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService<ConfigurationType>) => ({
-        uri: configService.get<DatabaseType>('database').uri,
-      }),
-    }),
+    MyConfigModule,
+    DatabaseModule,
     GqlConfigModule,
     UserModule,
     AuthModule,
     BcryptjsModule,
     MailModule,
-    UserPasswordModule,
+    MyConfigModule,
+    DatabaseModule,
   ],
   providers: [AppService, AppResolver],
 })

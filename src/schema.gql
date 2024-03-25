@@ -28,10 +28,6 @@ type FindAllResDto {
   total_pages: Int!
 }
 
-input ForgotPasswordDto {
-  email: String!
-}
-
 type MessageResDto {
   message: String
 }
@@ -50,23 +46,13 @@ type Query {
   emailVerified(emailVerifiedDto: EmailVerifiedDto!): MessageResDto!
   findAllUsers(paginationDto: PaginationDto!): FindAllResDto!
   findUserById(id: String!): User!
-  forgotPassword(forgotPasswordDto: ForgotPasswordDto!): MessageResDto!
   getHello: String!
   logout: MessageResDto!
   me: User!
   refreshTokens: AccessResDto!
   resendVerificationEmail: MessageResDto!
-  resetPassword(resetPasswordDto: ResetPasswordDto!): MessageResDto!
   signIn(signInDto: SignInDto!): AccessResDto!
   signUp(signUpDto: SignUpDto!): AccessResDto!
-  updatePassword(updatePasswordDto: UpdatePasswordDto!): MessageResDto!
-}
-
-input ResetPasswordDto {
-  _id: String!
-  confirmPassword: String!
-  password: String!
-  token: String!
 }
 
 input SignInDto {
@@ -78,11 +64,6 @@ input SignUpDto {
   email: String!
   password: String!
   username: String!
-}
-
-input UpdatePasswordDto {
-  confirmPassword: String!
-  password: String!
 }
 
 input UpdateUserDto {
