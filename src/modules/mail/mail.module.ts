@@ -7,6 +7,7 @@ import {
   MailType,
 } from 'src/config/configuration.interface';
 import { MailService } from './mail.service';
+import { join } from 'path';
 
 @Global()
 @Module({
@@ -30,7 +31,7 @@ import { MailService } from './mail.service';
             from: `"No Reply" <${mail.from}>`,
           },
           template: {
-            dir: `${process.cwd()}/static/templates`,
+            dir: join(process.cwd(), '/static/templates'),
             adapter: new HandlebarsAdapter(),
             options: {
               strict: true,

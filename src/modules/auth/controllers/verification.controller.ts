@@ -16,6 +16,7 @@ export class VerificationController {
     description: 'Email verified',
     type: MessageResDto,
   })
+  @JwtAuth()
   @Patch('email')
   emailVerified(
     @Body() emailVerifiedDto: EmailVerifiedDto,
