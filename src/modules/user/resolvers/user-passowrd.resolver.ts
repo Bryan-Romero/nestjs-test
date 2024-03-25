@@ -1,6 +1,6 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GetUser, JwtAuth } from 'src/common/decorators';
-import { MessageResDto } from 'src/common/dto';
+import { MessageResDto } from 'src/common/dtos';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';

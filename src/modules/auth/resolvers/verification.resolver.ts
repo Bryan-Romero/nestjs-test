@@ -1,6 +1,6 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GetUser, JwtAuth } from 'src/common/decorators';
-import { MessageResDto } from 'src/common/dto';
+import { MessageResDto } from 'src/common/dtos';
 import { EmailVerifiedDto } from '../dto/email-verified.dto';
 import { VerificationService } from '../services/verification.service';
 

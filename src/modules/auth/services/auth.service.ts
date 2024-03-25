@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { randomUUID } from 'crypto';
 import { Types } from 'mongoose';
-import { MessageResDto } from 'src/common/dto';
+import { MessageResDto } from 'src/common/dtos';
 import { ExceptionMessage, StandardMessage } from 'src/common/enums';
 import { JwtPayload } from 'src/common/interfaces';
 import {

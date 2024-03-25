@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ApiKey, GetUser, JwtAuth } from 'src/common/decorators';
-import { PaginationDto } from 'src/common/dto';
+import { PaginationDto } from 'src/common/dtos';
 import { Role } from 'src/common/enums';
 import { ParseObjectIdPipe } from 'src/common/pipes';
 import { CreateUserDto } from '../dto/create-user.dto';

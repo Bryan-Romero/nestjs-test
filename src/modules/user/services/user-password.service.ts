@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { MessageResDto } from 'src/common/dto';
+import { MessageResDto } from 'src/common/dtos';
 import { ExceptionMessage, StandardMessage } from 'src/common/enums';
 import { JwtForgotPassPayload } from 'src/common/interfaces';
 import { ConfigurationType, JwtType } from 'src/config/configuration.interface';

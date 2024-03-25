@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { PipelineStage, ProjectionType } from 'mongoose';
 import { BcryptjsService } from 'src/modules/bcryptjs/bcryptjs.service';
-import { MessageResDto, PaginationDto } from 'src/common/dto';
+import { MessageResDto, PaginationDto } from 'src/common/dtos';
 import { ExceptionMessage, Role, StandardMessage } from 'src/common/enums';
 import { UserRequest } from 'src/common/interfaces';
 import { generateRandomPassword } from 'src/common/utils/generate-random-pass';

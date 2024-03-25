@@ -6,7 +6,7 @@ import {
   JwtAuth,
   JwtRefreshAuth,
 } from 'src/common/decorators';
-import { MessageResDto } from 'src/common/dto';
+import { MessageResDto } from 'src/common/dtos';
 import { AccessResDto } from '../dto/access-res.dto';
 import { SignInDto } from '../dto/sign-in.dto';
 import { SignUpDto } from '../dto/sign-up.dto';

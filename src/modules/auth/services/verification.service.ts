@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { MailService } from 'src/modules/mail/mail.service';
 import { User, UserModel } from 'src/modules/user/entities/user.entity';
 import { EmailVerifiedDto } from '../dto/email-verified.dto';
-import { MessageResDto } from 'src/common/dto';
+import { MessageResDto } from 'src/common/dtos';
 import { ExceptionMessage, StandardMessage } from 'src/common/enums';
 import { randomUUID } from 'crypto';
 
