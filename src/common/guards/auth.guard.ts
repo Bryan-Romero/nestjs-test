@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigurationType, JwtType } from 'src/config/configuration.interface';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/modules/user/services/user.service';
 import { IS_PUBLIC_KEY } from '../decorators';
 import { ExceptionMessage } from '../enums';
 import { JwtPayload } from '../interfaces';

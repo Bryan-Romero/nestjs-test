@@ -19,6 +19,7 @@ ENV NODE_ENV=development
 COPY package*.json $DIR
 COPY tsconfig*.json $DIR
 COPY src $DIR/src
+COPY src $DIR/static
 
 # RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $DIR/.npmrc && \
 #     npm install && \
@@ -44,6 +45,7 @@ RUN apk update && apk add --no-cache dumb-init
 COPY package*.json $DIR
 COPY tsconfig*.json $DIR
 COPY src $DIR/src
+COPY src $DIR/static
 
 # RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $DIR/.npmrc && \
 #     npm ci && \
@@ -66,6 +68,7 @@ ENV USER node
 COPY --from=build /usr/bin/dumb-init /usr/bin/dumb-init
 COPY --from=build $DIR/node_modules $DIR/node_modules
 COPY --from=build $DIR/dist $DIR/dist
+COPY --from=build $DIR/static $DIR/static
 COPY --from=build $DIR/src/config/env/.env.${NODE_ENV} $DIR/src/config/env/.env.${NODE_ENV}
 
 EXPOSE $PORT
